@@ -21,6 +21,8 @@ void display ()
 		terrainShader->apply();
 		grid->draw();
 	}
+		cowShader->apply();
+		cow->draw();
 	
 	if (drawSkyBox)
 	{
@@ -374,6 +376,7 @@ void updateView()
 	
 	terrainShader->updateViewMatrix(worldView);
 	skyboxShader->updateViewMatrix(worldView);
+	cowShader->updateViewMatrix(worldView);
 	//phongShader->updateViewMatrix(worldView);
 }
 
@@ -385,6 +388,7 @@ void updateProjection(int width, int height)
 	
 	terrainShader->updateProjectionMatrix(projection);
 	skyboxShader->updateProjectionMatrix(projection);
+	cowShader->updateProjectionMatrix(projection);
 	//phongShader->updateProjectionMatrix(projection);
 }
 
@@ -513,6 +517,10 @@ void init ()
 	skyboxShader->updateWorldMatrix(skyboxWorld);
 	skyboxShader->apply();
 	cube = new Cube(20);
+	
+	cowShader = new Shader("Cow");
+	cowShader->apply();
+	cow = new ModelLoadedMesh("models/cow.obj");
 	
 	//skybox = new Skybox(cameraEye);
 	

@@ -17,6 +17,7 @@
 #include "Terrain.h"
 #include "CubeMapTexture.h"
 #include "Skybox.h"
+#include "ModelLoadedMesh.h"
 
 using glm::mat4;
 using glm::vec3;
@@ -217,11 +218,15 @@ Shader* skyboxShader = NULL;
 
 Shader* gridShader = NULL;
 
+Shader* cowShader = NULL;
+
 Shader* shaders [3];
 
 Mesh* grid = NULL;
 
 Mesh* cube = NULL;
+
+Mesh* cow = NULL;
 
 Skybox* skybox = NULL;
 
