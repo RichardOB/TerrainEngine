@@ -21,34 +21,39 @@ using std::vector;
 using std::stringstream; 
 
 using glm::vec3;
+using glm::vec2;
 
 class ModelLoadedMesh: public Mesh
 {
-   public:
-      /**
-        * Constructor.
-        *
-        * @param length Side length of the Cube.
-        */
-      ModelLoadedMesh(string fileName);
+	public:
+		/**
+		* Constructor.
+		*
+		* @param length Side length of the Cube.
+		*/
+		ModelLoadedMesh(string fileName);
    
 	
 
-      /**
-        * Draw the Cube.
-        *
-        * Overloaded so that we can draw indices.
-        */
-      virtual void draw();
+		/**
+		* Draw the Cube.
+		*
+		* Overloaded so that we can draw indices.
+		*/
+		virtual void draw();
 
-   private:
+	private:
 	   
-   string charArrayToString(char* characters);
+		string charArrayToString(char* characters);
    
-   float stringToFloat(string str);
+		float stringToFloat(string str);
    
-      /** Amount of indices in the mesh. */
-      GLsizei _indexCount;
+		/** Amount of indices in the mesh. */
+		GLsizei _indexCount;
+   
+		vector<vec3> out_vertices;
+		vector<vec2> out_uvs;
+		vector<vec3> out_normals;
 };
 
 #endif

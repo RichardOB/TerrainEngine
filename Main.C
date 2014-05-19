@@ -21,8 +21,10 @@ void display ()
 		terrainShader->apply();
 		grid->draw();
 	}
+		//glDisable(GL_CULL_FACE);
 		cowShader->apply();
 		cow->draw();
+	glEnable(GL_CULL_FACE);
 	
 	if (drawSkyBox)
 	{
@@ -42,8 +44,11 @@ void display ()
 		skyboxShader->apply();
 		cube->draw();
 		
+		#pragma GCC diagnostic push
+		#pragma GCC diagnostic ignored "-Wsign-conversion"
 		glCullFace(OldCullFaceMode); 
 		glDepthFunc(OldDepthFuncMode);
+		#pragma GCC diagnostic pop
 		//glDepthMask(GL_TRUE);
 		//skybox->render();
 	}
@@ -510,6 +515,19 @@ void init ()
 	terrainShader->apply();
 	grid = new Terrain("heightmaps/GoodHeightmap1.png");
 	
+	mat4 tigerWorld;
+	//tigerWorld = scale(tigerWorld, vec3(0.025f,0.025f,0.025f));
+	tigerWorld = translate(tigerWorld, vec3(60,83,185));
+	tigerWorld = scale(tigerWorld, vec3(0.015f,0.015f,0.015f));
+	
+	Texture* tex = new Texture("textures/bricks", "bricks.png"); 
+	tex->load();
+	cowShader = new Shader("palm");
+	cowShader->updateWorldMatrix(tigerWorld);
+	cowShader->apply();
+	cow = new ModelLoadedMesh("models/Tiger.obj");
+	
+	
 	skyboxShader = new Shader("Skybox");
 	mat4 skyboxWorld;
 	skyboxWorld = translate(skyboxWorld, vec3(cameraEye.x, cameraEye.y, cameraEye.z));
@@ -518,9 +536,6 @@ void init ()
 	skyboxShader->apply();
 	cube = new Cube(20);
 	
-	cowShader = new Shader("Cow");
-	cowShader->apply();
-	cow = new ModelLoadedMesh("models/cow.obj");
 	
 	//skybox = new Skybox(cameraEye);
 	

@@ -1,0 +1,39 @@
+#version 420
+
+layout (location=1) in vec3 position;
+layout (location=2) in vec3 normals;
+layout (location=3) in vec2 uv;
+
+layout(binding=0) uniform sampler2D tex;
+//uniform vec3 lightPos;
+
+uniform mat4 lightProj;
+uniform mat4 lightView;
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 world;
+
+out vec4 v_colour;
+out vec3 v_normal;
+//out vec4 v_light;
+out vec3 v_lightDir;
+out vec2 TexCoord;
+
+const mat4 bias = mat4(.5f, .0f, .0f, .0f,
+   .0f, .5f, .0f, .0f,
+   .0f, .0f, .5f, .0f,
+   .5f, .5f, .5f, 1.f);
+
+void main()
+{
+   gl_Position = projection * view * world * vec4(position, 1.0f);
+   //v_light = bias * lightProj * lightView * world * vec4(position, 1.0f);
+   v_colour = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+   v_normal = normals;
+
+TexCoord = uv;
+
+   vec3 lightPos = vec3(300.0f, 300.0f, 300.0f);
+   v_lightDir = normalize(lightPos - (world * vec4(position, 1.0f)).xyz);
+}
+

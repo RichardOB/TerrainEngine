@@ -16,6 +16,7 @@
 #include "Grid.h"
 #include "Terrain.h"
 #include "CubeMapTexture.h"
+#include "Texture.h"
 #include "Skybox.h"
 #include "ModelLoadedMesh.h"
 
