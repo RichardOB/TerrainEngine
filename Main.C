@@ -11,18 +11,39 @@ void display ()
 	//Clear the screen
 	//Clears both the screen's colour and the depth of anything it is displaying
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	writeToCubeMapBuffer();
 	
-	//cube->draw();
 	
 	
+	
+	
+	drawScene();
+	
+	//Instruct OpenGL to send all our commands to the graphics card (if it hasn't done so already)
+	glFlush();
+	
+	//Swap the buffers. i.e. we write to one while other displays to prevent "screen tearing" where half of the old pixels still remain.
+	glutSwapBuffers();
+	
+	printFPS();
+	
+	last_frame = getTime();
+}
+
+void drawScene()
+{
 	
 	if(drawTerrain)
 	{
 		terrainShader->apply();
 		grid->draw();
 	}
-		cowShader->apply();
-		cow->draw();
+	
+	if(drawTiger)
+	{
+		tigerShader->apply();
+		tiger->draw();
+	}
 	
 	if (drawSkyBox)
 	{
@@ -34,7 +55,6 @@ void display ()
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 		glCullFace(GL_FRONT);
 		glDepthFunc(GL_LEQUAL);
-		//glDepthMask(GL_FALSE);
 
 		mat4 skyboxWorld;
 		skyboxWorld = translate(skyboxWorld, vec3(cameraEye.x, cameraEye.y, cameraEye.z));
@@ -47,23 +67,22 @@ void display ()
 		glCullFace(OldCullFaceMode); 
 		glDepthFunc(OldDepthFuncMode);
 		#pragma GCC diagnostic pop
-		//glDepthMask(GL_TRUE);
-		//skybox->render();
 	}
+}
+
+void writeToCubeMapBuffer()
+{
+	screenShot->bind();
 	
-	//glDisable(GL_CULL_FACE);
-	//phongShader->apply();
-	//cube->draw();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	//Instruct OpenGL to send all our commands to the graphics card (if it hasn't done so already)
-	glFlush();
+	//updateAlternateView();
+	updateView();
+	drawScene();
+
+	screenShot->unbind();
 	
-	//Swap the buffers. i.e. we write to one while other displays to prevent "screen tearing" where half of the old pixels still remain.
-	glutSwapBuffers();
-	
-	printFPS();
-	
-	last_frame = getTime();
+	updateView();
 }
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -258,6 +277,13 @@ void keyboard(unsigned char key, int x, int y)
 		cout << "\nLooking At = (" << cameraAt.x << "," << cameraAt.y << "," << cameraAt.z <<")" << endl;
 	break;
 	
+	case 'p':
+		writeToCubeMapBuffer();
+         screenShot->bind();
+         screenShot->write();
+         screenShot->unbind();
+         break;
+	
 	case KEY_ESCAPE:
          printf("Bye!\n");
          exit(0);
@@ -375,6 +401,13 @@ void reshape(int newWidth, int newHeight)
 	//Fix our viewport
 	glViewport (0, 0, newWidth, newHeight);
 	
+	/*if (screenShot != NULL)
+	{
+		delete screenShot;
+	}*/
+	screenShot = new ColourBuffer(newWidth, newHeight);
+	//screenShot->unbind();
+	
 	//Ask GLUT for a redraw. Tells GLUT to call display function
 	glutPostRedisplay();
 }
@@ -385,7 +418,17 @@ void updateView()
 	
 	terrainShader->updateViewMatrix(worldView);
 	skyboxShader->updateViewMatrix(worldView);
-	cowShader->updateViewMatrix(worldView);
+	tigerShader->updateViewMatrix(worldView);
+	//phongShader->updateViewMatrix(worldView);
+}
+
+void updateAlternateView()
+{
+	mat4 worldView = lookAt(altCameraEye, altCameraAt, altCameraUp);
+	
+	terrainShader->updateViewMatrix(worldView);
+	skyboxShader->updateViewMatrix(worldView);
+	tigerShader->updateViewMatrix(worldView);
 	//phongShader->updateViewMatrix(worldView);
 }
 
@@ -397,7 +440,7 @@ void updateProjection(int width, int height)
 	
 	terrainShader->updateProjectionMatrix(projection);
 	skyboxShader->updateProjectionMatrix(projection);
-	cowShader->updateProjectionMatrix(projection);
+	tigerShader->updateProjectionMatrix(projection);
 	//phongShader->updateProjectionMatrix(projection);
 }
 
@@ -528,10 +571,10 @@ void init ()
 	
 	Texture* tex = new Texture("textures/bricks", "bricks.png"); 
 	tex->load();
-	cowShader = new Shader("palm");
-	cowShader->updateWorldMatrix(tigerWorld);
-	cowShader->apply();
-	cow = new ModelLoadedMesh("models/Tiger.obj");
+	tigerShader = new Shader("palm");
+	tigerShader->updateWorldMatrix(tigerWorld);
+	tigerShader->apply();
+	tiger = new ModelLoadedMesh("models/Tiger.obj");
 	
 	
 	skyboxShader = new Shader("Skybox");

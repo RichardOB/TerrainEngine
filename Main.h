@@ -19,6 +19,7 @@
 #include "Texture.h"
 #include "Skybox.h"
 #include "ModelLoadedMesh.h"
+#include "ColourBuffer.h"
 
 using glm::mat4;
 using glm::vec3;
@@ -141,6 +142,23 @@ GLfloat zMove = 0.0f;
  */
  vec3 cameraUp(0,1,0);
  
+ //ALTERNATIVE VIEW MATRIX VARIABLES
+
+ /*
+ * The position of the camera
+ */
+ vec3 altCameraEye(0,50,0);//222 
+ 
+ /*
+ * The direction (vector) the camera is looking
+ */
+ vec3 altCameraAt(255,0,255);
+ 
+ /*
+ * The up direction (vector) for the camera
+ */
+ vec3 altCameraUp(0,1,0);
+ 
  //PROJECTION MATRIX VARIABLES
  /* 
   * Vertical field-of-view. 
@@ -219,7 +237,7 @@ Shader* skyboxShader = NULL;
 
 Shader* gridShader = NULL;
 
-Shader* cowShader = NULL;
+Shader* tigerShader = NULL;
 
 Shader* shaders [3];
 
@@ -227,14 +245,17 @@ Mesh* grid = NULL;
 
 Mesh* cube = NULL;
 
-Mesh* cow = NULL;
+Mesh* tiger = NULL;
 
 Skybox* skybox = NULL;
+
+ColourBuffer* screenShot = NULL;
 
 /* Toggle Draw Methods */
 
 bool drawTerrain = true;
 bool drawSkyBox = true;
+bool drawTiger = true;
 	
 /*METHODS*/
 
@@ -242,6 +263,10 @@ bool drawSkyBox = true;
  * GLUT display callback function.
  */
 void display();
+
+void drawScene();
+
+void writeToCubeMapBuffer();
 
 void keyboardUp(unsigned char key, int x, int y);
 
@@ -282,6 +307,9 @@ updateWorld();
  */
 void
 updateView();
+
+void
+updateAlternateView();
 
 /**
  * Updates the current projection matrix used by the shaders (Uniform 'projection').
