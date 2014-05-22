@@ -49,6 +49,11 @@ class CubeMapTexture
 	void load();
    
 	void bind();
+	
+	void addNewTexture(const string& directory, 
+		const string& posXName, const string& negXName, 
+		const string& posYName, const string& negYName, 
+		const string& posZName, const string& negZName);
 
    private:
 	   

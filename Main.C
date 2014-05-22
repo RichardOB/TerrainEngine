@@ -21,10 +21,8 @@ void display ()
 		terrainShader->apply();
 		grid->draw();
 	}
-		//glDisable(GL_CULL_FACE);
 		cowShader->apply();
 		cow->draw();
-	glEnable(GL_CULL_FACE);
 	
 	if (drawSkyBox)
 	{
@@ -252,6 +250,12 @@ void keyboard(unsigned char key, int x, int y)
 			birdsEye = false;
 
 		}
+	break;
+		
+	case 'v':
+		cout << "Camera:\n Position = (" << cameraEye.x << "," << cameraEye.y << "," << cameraEye.z <<")";
+		cout << "\nUp = (" << cameraUp.x << "," << cameraUp.y << "," << cameraUp.z <<")";
+		cout << "\nLooking At = (" << cameraAt.x << "," << cameraAt.y << "," << cameraAt.z <<")" << endl;
 	break;
 	
 	case KEY_ESCAPE:
@@ -508,7 +512,9 @@ void init ()
 	//flatShader = new Shader("terrain");
 
 	//CubeMapTexture* t = new CubeMapTexture("textures/skybox", "terrain_positive_x.png", "terrain_negative_x.png", "terrain_positive_y.png", "terrain_negative_y.png", "terrain_positive_z.png", "terrain_negative_z.png");
-	CubeMapTexture* t = new CubeMapTexture("textures/skybox", "dunes_positive_x.png", "dunes_negative_x.png", "dunes_positive_y.png", "terrain_negative_y.png", "dunes_positive_z.png", "dunes_negative_z.png");
+	CubeMapTexture* t = new CubeMapTexture("textures/skybox", "dunes_positive_x.png", "dunes_negative_x.png", "dunes_positive_y.png", "dunes_negative_y.png", "dunes_positive_z.png", "dunes_negative_z.png");
+	//t->load();
+	//t->addNewTexture("textures/skybox", "evening_dunes_positive_x.png", "evening_dunes_negative_x.png", "evening_dunes_positive_y.png", "evening_dunes_negative_y.png", "evening_dunes_positive_z.png", "evening_dunes_negative_z.png");
 	t->load();
 	
 	terrainShader = new Shader("Grid");

@@ -20,10 +20,27 @@ CubeMapTexture(const string& directory,
 	cout << "Texture Unit for Cube Map Texture: "<< textureUnit <<endl;
 }
 
+void CubeMapTexture::addNewTexture(const string& directory, 
+		const string& posXName, const string& negXName, 
+		const string& posYName, const string& negYName, 
+		const string& posZName, const string& negZName)
+{
+	fileNames[0] = directory + "/" +  posXName;
+	fileNames[1] = directory + "/" +  negXName;
+	fileNames[2] = directory + "/" +  posYName;
+	fileNames[3] = directory + "/" +  negYName;
+	fileNames[4] = directory + "/" +  posZName;
+	fileNames[5] = directory + "/" +  negZName;
+	
+	textureHandle = 0;
+	textureUnit = TextureUnit::getInstance()->getNextUnitEnum();
+	cout << "Texture Unit for Cube Map Texture: "<< textureUnit <<endl;
+}
+
 CubeMapTexture::
 ~CubeMapTexture()
 {
-   
+	
 }
 
 void CubeMapTexture::bind()

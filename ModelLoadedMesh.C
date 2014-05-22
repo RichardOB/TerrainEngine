@@ -38,7 +38,7 @@ ModelLoadedMesh(string fileName):
 			vec3 vertex;
 			fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
 			
-			cout << "v: " << vertex.x << " " << vertex.y << " " << vertex.z << endl;
+			//cout << "v: " << vertex.x << " " << vertex.y << " " << vertex.z << endl;
 			temp_vertices.push_back(vertex);
 			
 			fscanf(file, "%s", line);
@@ -188,7 +188,6 @@ ModelLoadedMesh(string fileName):
 	for (unsigned i = 0; i < uvIndices.size(); i++)
 	{
 		unsigned uvIndex = uvIndices[i];
-		cout << uvIndex -1;
 		tempUvsIndices[i] = uvIndex - 1;
 	}
 	
