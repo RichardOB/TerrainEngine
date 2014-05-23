@@ -163,7 +163,7 @@ GLfloat zMove = 0.0f;
  /* 
   * Vertical field-of-view. 
   */
-GLfloat FOVY = 60.0f;
+GLfloat FOVY = 45.0f;
 
 /* 
  * Near clipping plane. 
@@ -279,6 +279,8 @@ void keyboard(unsigned char, int, int);
  * GLUT mouse callback function.
  */
 void mouse(int, int, int, int);
+
+void lookDirection(GLfloat, GLfloat);
 
 void mouseLook (int x, int y);
 

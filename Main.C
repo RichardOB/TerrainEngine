@@ -73,6 +73,7 @@ void drawScene()
 void writeToCubeMapBuffer()
 {
 	screenShot->bind();
+	FOVY = 90.0f;
 	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
@@ -81,6 +82,8 @@ void writeToCubeMapBuffer()
 	drawScene();
 
 	screenShot->unbind();
+	
+	FOVY = 45.0f;
 	
 	updateView();
 }
@@ -95,7 +98,7 @@ void keyboardUp(unsigned char key, int x, int y)
 void keyboard(unsigned char key, int x, int y)
 {
 	//int size;
-	
+	vec3 yAxis (0, 1, 0);
 	active_keys[key] = true;
 	
     switch (key)
@@ -253,6 +256,72 @@ void keyboard(unsigned char key, int x, int y)
 		}
 		
 	break;
+		
+	case '1':
+		//POSITIVE Y
+		cameraAt.x = 10000.0f;
+		//cameraAt.y = 0.0f;
+		cameraAt.y = cameraEye.y;
+		//cameraAt.z = 0.0f;
+		cameraAt.z = cameraEye.z;
+	
+		lookDirection(0.0f,89.5f);
+	break;
+	
+	case '2':
+		//NEGATIVE Y
+		cameraAt.x = 10000.0f;
+		//cameraAt.y = 0.0f;
+		cameraAt.y = cameraEye.y;
+		//cameraAt.z = 0.0f;
+		cameraAt.z = cameraEye.z;
+	
+		lookDirection(0.0f,-89.50f);
+	break;
+	
+	case '3':
+		//POSITIVE X
+		cameraAt.x = 10000.0f;
+		//cameraAt.y = 0.0f;
+		cameraAt.y = cameraEye.y;
+		//cameraAt.z = 0.0f;
+		cameraAt.z = cameraEye.z;
+	
+		lookDirection(0.0f,0.0f);
+	break;
+	
+	case '4':
+		//NEGATIVE X
+		cameraAt.x = -10000.0f;
+		//cameraAt.y = 0.0f;
+		cameraAt.y = cameraEye.y;
+		//cameraAt.z = 0.0f;
+		cameraAt.z = cameraEye.z;
+	
+		lookDirection(0.0f,0.0f);
+	break;
+	
+	case '5':
+		//POSITIVE Z
+		cameraAt.x = 10000.0f;
+		//cameraAt.y = 0.0f;
+		cameraAt.y = cameraEye.y;
+		//cameraAt.z = 0.0f;
+		cameraAt.z = cameraEye.z;
+	
+		lookDirection(-90.0f,0.0f);
+	break;
+	
+	case '6':
+		//NEGATIVE Z
+		cameraAt.x = 10000.0f;
+		//cameraAt.y = 0.0f;
+		cameraAt.y = cameraEye.y;
+		//cameraAt.z = 0.0f;
+		cameraAt.z = cameraEye.z;
+	
+		lookDirection(90.0f,0.0f);
+	break;
 	       
 	case 'c':
 		xScale = yScale = zScale = 1.0f;
@@ -346,6 +415,22 @@ void mouse(int button, int state, int x, int y)
 	cout << "at [" << x << ", " << y << "] " << endl;
 }
 
+void lookDirection(GLfloat hRotation, GLfloat vRotation)
+{
+	vec3 direction = (cameraAt - cameraEye);
+	vec3 right = glm::cross(direction, cameraUp);
+	
+	mat4 rotation; //create empty 4x4 rotation matrix
+	rotation = glm::rotate (rotation, hRotation, cameraUp);
+	rotation = glm::rotate (rotation, vRotation, right);
+	
+	glm::vec4 d (direction.x, direction.y, direction.z, 0.0f);//create a vec4 direction vector so that we can rotate it
+	
+	d = rotation * d;
+	
+	cameraAt = cameraEye + vec3(d.x, d.y, d.z);
+}
+
 void mouseLook (int x, int y)
 {
 	int horizontal_centre = WINDOW_WIDTH / 2;
@@ -415,6 +500,15 @@ void reshape(int newWidth, int newHeight)
 void updateView()
 {
 	mat4 worldView = lookAt(cameraEye, cameraAt, cameraUp);
+	
+	vec3 xAxis(1,0,0);
+	worldView = rotate(worldView, xRot,xAxis);
+	
+	vec3 yAxis(0,1,0);
+	worldView = rotate(worldView, yRot, yAxis);
+	
+	vec3 zAxis(0,0,1);
+	worldView = rotate(worldView, zRot, zAxis);
 	
 	terrainShader->updateViewMatrix(worldView);
 	skyboxShader->updateViewMatrix(worldView);
