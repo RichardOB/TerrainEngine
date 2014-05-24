@@ -45,16 +45,17 @@ CubeMapTexture::
 
 void CubeMapTexture::bind()
 {
-	glActiveTexture(textureUnit);
+	//glActiveTexture(textureUnit);
 	glBindTexture(GL_TEXTURE_CUBE_MAP,  textureHandle);
 }
 
 void CubeMapTexture::load()
 {
 	//Tell openGL to enable texturing parts
-	glEnable(GL_TEXTURE_CUBE_MAP);
+	//glEnable(GL_TEXTURE_CUBE_MAP);
 	//use Texture Unit instantiated from Singleton Class
-	glActiveTexture(textureUnit);
+	
+	//glActiveTexture(textureUnit);
 	
 	//Textures are also objects
 	//This means, we need to generate one and bind it to the context.

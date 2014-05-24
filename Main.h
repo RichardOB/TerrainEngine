@@ -82,6 +82,8 @@ int last_print;
 
 bool birdsEye = false;
 
+float mixRatio = 0.0;
+
 //SCALE MATRIX VARIABLES
 
 /*

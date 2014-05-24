@@ -82,6 +82,8 @@ void drawScene()
 		skyboxWorld = translate(skyboxWorld, vec3(cameraEye.x, cameraEye.y, cameraEye.z));
 		skyboxShader->updateWorldMatrix(skyboxWorld);
 		skyboxShader->apply();
+		
+		skyboxShader->updateUniform("mixRatio", mixRatio);
 		cube->draw();
 		
 		#pragma GCC diagnostic push
@@ -94,12 +96,21 @@ void drawScene()
 	if (drawWater)
 	{	//glDisable(GL_DEPTH_TEST);
 		waterShader->apply();
+		if (enableFog)
+		{
+			//waterShader->updateUniform("fog", 1.0f);
+		}
+		else
+		{
+			//waterShader->updateUniform("fog", 0.0f);
+		}
 		waterPlane->draw();
 		//glEnable(GL_DEPTH_TEST);
 	}
 	
 	reflection->apply();
 	reflectSphere->apply();
+	reflectSphere->updateUniform("mixRatio", mixRatio);
 	sphere->draw();
 }
 
@@ -339,11 +350,19 @@ void keyboard(unsigned char key, int x, int y)
 	break;
        
 	case '=':
-         FOVY += 1;
+		if (mixRatio < 1.0f)
+		{
+			cout << "Mix Ratio: " << mixRatio << endl;
+			mixRatio = mixRatio + 0.01f;
+		}
          break;
 	
 	case '-':
-         FOVY -= 1;
+		if (mixRatio > 0.0f)
+		{
+			mixRatio = mixRatio - 0.01f;
+		}
+		
          break;
 	
 	case ',':
@@ -846,10 +865,13 @@ void init ()
 	//flatShader = new Shader("terrain");
 
 	//CubeMapTexture* t = new CubeMapTexture("textures/skybox", "terrain_positive_x.png", "terrain_negative_x.png", "terrain_positive_y.png", "terrain_negative_y.png", "terrain_positive_z.png", "terrain_negative_z.png");
+	glActiveTexture(GL_TEXTURE1);
 	CubeMapTexture* t = new CubeMapTexture("textures/skybox", "dunes_positive_x.png", "dunes_negative_x.png", "dunes_positive_y.png", "dunes_negative_y.png", "dunes_positive_z.png", "dunes_negative_z.png");
-	//t->load();
-	//t->addNewTexture("textures/skybox", "evening_dunes_positive_x.png", "evening_dunes_negative_x.png", "evening_dunes_positive_y.png", "evening_dunes_negative_y.png", "evening_dunes_positive_z.png", "evening_dunes_negative_z.png");
 	t->load();
+	
+	glActiveTexture(GL_TEXTURE0);
+	CubeMapTexture* t2 = new CubeMapTexture("textures/skybox", "evening_dunes_positive_x.png", "evening_dunes_negative_x.png", "evening_dunes_positive_y.png", "evening_dunes_negative_y.png", "evening_dunes_positive_z.png", "evening_dunes_negative_z.png");
+	t2->load();
 	
 	terrainShader = new Shader("Grid");
 	terrainShader->apply();
@@ -868,7 +890,8 @@ void init ()
 	tiger = new ModelLoadedMesh("models/Tiger.obj");
 	
 	mat4 sphereWorld;
-	sphereWorld = translate(sphereWorld, vec3(60,100,185));
+	sphereWorld = translate(sphereWorld, vec3(60,120,185));
+	sphereWorld = scale(sphereWorld, vec3(20,20,20));
 	reflectSphere = new Shader("ReflectionSphere");
 	
 	reflectSphere->updateWorldMatrix(sphereWorld);

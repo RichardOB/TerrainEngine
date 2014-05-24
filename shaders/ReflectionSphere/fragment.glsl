@@ -1,12 +1,14 @@
 #version 430
 
-layout(location=1) uniform samplerCube cubeMap;
-layout(location=2) uniform samplerCube cubeMap2;
+layout(binding=0) uniform samplerCube eveningScene;
+layout(binding=1) uniform samplerCube dayScene;
 
 const int sampleWidth = 1;
 
 const float Ka = 0.5f;
 const float Kd = 2f;
+
+uniform float mixRatio;
 
 in vec4 v_colour;
 in vec3 v_normal;
@@ -35,8 +37,12 @@ void main()
 
    float intensity = Ia  * Id;
 	
-	vec4 col = texture(cubeMap, reflection);
-   fragment = vec4(/*intensity*/ 0.8f * col);
+	//vec4 col = texture(cubeMap, reflection);
+	vec4 colour_1 = texture(dayScene, reflection);
+	vec4 colour_2 = texture(eveningScene, reflection);
+	vec4 f_colour = mix (colour_1, colour_2, mixRatio);
+   
+   fragment = vec4(/*intensity*/ 0.8f * f_colour);
 
 	//vec3 col = texture(cubeMap, reflection);
 }
