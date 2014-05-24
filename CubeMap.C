@@ -208,12 +208,24 @@ write(int id)
 void CubeMap::bind()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, handle);
+	//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, handle);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	
 }
 
 void CubeMap::unbind()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+ void CubeMap::apply()
+{
+	//Tell openGL to enable texturing parts
+	glEnable(GL_TEXTURE_CUBE_MAP);
+	//use Texture Unit instantiated from Singleton Class
+	glActiveTexture(GL_TEXTURE10);
+	glBindTexture(GL_TEXTURE_CUBE_MAP,  textureHandle);
+	glUniform1i (1, 10);
 }
 
 unsigned char* CubeMap::loadTextureFromPNG(const string fileName, int& w, int& h)

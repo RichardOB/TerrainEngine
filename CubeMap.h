@@ -36,6 +36,8 @@ class CubeMap
 	
 		void unbind();
 	
+		void apply();
+	
 		void attachToNewTexture(int face);
 	
 		unsigned char* loadTextureFromPNG(const string fileName, int& w, int& h);

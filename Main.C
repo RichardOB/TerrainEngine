@@ -12,10 +12,15 @@ void display ()
 	//Clears both the screen's colour and the depth of anything it is displaying
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
+	//drawTerrain = false;
+	//drawSkyBox = false;
+	//drawTiger = false;
+	//useReflection = true;
 	
 	if (useReflection)
 	{
 		writeToCubeMapBuffer();
+		useReflection = false;
 	}
 	
 	drawScene();
@@ -33,9 +38,11 @@ void display ()
 
 void drawScene()
 {
-
+	updateFog();
+	
+	reflection->apply();
 	reflectSphere->apply();
-	cube->draw();
+	sphere->draw();
 	
 	if(drawTerrain)
 	{
@@ -45,7 +52,16 @@ void drawScene()
 	
 	if(drawTiger)
 	{
+		
 		tigerShader->apply();
+		if (enableFog)
+		{
+			tigerShader->updateUniform("fog", 1.0f);
+		}
+		else
+		{
+			tigerShader->updateUniform("fog", 0.0f);
+		}
 		tiger->draw();
 	}
 	
@@ -229,78 +245,75 @@ void keyboard(unsigned char key, int x, int y)
 	
     switch (key)
    {
-      case 'W':
-         xRot += ANGLE_DELTA;
-         break;
-      
-      case 'S':
-         xRot -= ANGLE_DELTA;
-         break;
-      
-      case 'A':
-         yRot += ANGLE_DELTA;
-         break;
-      
-      case 'D':
-         yRot -= ANGLE_DELTA;
-         break;
-      
-       case 'Q':
-         zRot += ANGLE_DELTA;
-         break;
-       
-      case 'E':
-         zRot -= ANGLE_DELTA;
-         break;
-      
-      case 'H':
-	xMove += SCALE;
+	case '1':
+		//toggle skybox
+	cout << "drawSkybox: " << drawSkyBox << endl; 
+		if (drawSkyBox)
+		{
+			drawSkyBox = false;
+		}
+		else
+		{
+			drawSkyBox = true;
+		}
+	//drawTerrain = false;
+	//drawSkyBox = false;
+	//drawTiger = false;
+	//useReflection = true;
 	break;
-      
-      case 'F':
-	xMove -= SCALE;
+	
+	case '2':
+		//toggle terrain		
+		if (drawTerrain)
+		{
+			drawTerrain = false;
+		}
+		else
+		{
+			drawTerrain = true;
+		}
+		
 	break;
-      
-      case 'T':
-	yMove += SCALE;
+	
+	case '3':
+		//toggle tiger		
+		if (drawTiger)
+		{
+			drawTiger = false;
+		}
+		else
+		{
+			drawTiger = true;
+		}
+		
 	break;
-      
-      case 'G':
-	yMove -= SCALE;
+	
+	case '4':
+		//toggle reflection	
+		if (useReflection)
+		{
+			useReflection = false;
+		}
+		else
+		{
+			useReflection = true;
+		}
+		
 	break;
-      
-      case 'R':
-	zMove += SCALE;
+		
+	case 'f':
+		//toggle fog
+	cout << "enableFog: " << enableFog << endl; 
+		if (enableFog)
+		{
+			enableFog = false;
+		}
+		else
+		{
+			enableFog = true;
+		}
 	break;
-      
-      case 'Y':
-	zMove -= SCALE;
-	break;
-      
-       case 'I':
-	yScale += SCALE;
-	break;
-       
-       case 'K':
-	yScale -= SCALE;
-	break;
-       
-       case 'J':
-	xScale += SCALE;
-	break;
-       
-       case 'L':
-	xScale -= SCALE;
-	break;
-       
-       case 'U':
-	zScale += SCALE;
-	break;
-       
-       case 'O':
-	zScale -= SCALE;
-	break;
-       
+
        case 'z':
 		xScale = yScale = zScale = 1.0f;
 		xRot = yRot = zRot = 0.0f;
@@ -383,7 +396,7 @@ void keyboard(unsigned char key, int x, int y)
 		
 	break;
 		
-	case '1':
+	case '5':
 		//POSITIVE Y
 		cameraAt.x = 10000.0f;
 		//cameraAt.y = 0.0f;
@@ -394,7 +407,7 @@ void keyboard(unsigned char key, int x, int y)
 		lookDirection(0.0f,89.5f);
 	break;
 	
-	case '2':
+	case '6':
 		//NEGATIVE Y
 		cameraAt.x = 10000.0f;
 		//cameraAt.y = 0.0f;
@@ -405,7 +418,7 @@ void keyboard(unsigned char key, int x, int y)
 		lookDirection(0.0f,-89.50f);
 	break;
 	
-	case '3':
+	case '7':
 		//POSITIVE X
 		cameraAt.x = 10000.0f;
 		//cameraAt.y = 0.0f;
@@ -416,7 +429,7 @@ void keyboard(unsigned char key, int x, int y)
 		lookDirection(0.0f,0.0f);
 	break;
 	
-	case '4':
+	case '8':
 		//NEGATIVE X
 		cameraAt.x = -10000.0f;
 		//cameraAt.y = 0.0f;
@@ -427,7 +440,7 @@ void keyboard(unsigned char key, int x, int y)
 		lookDirection(0.0f,0.0f);
 	break;
 	
-	case '5':
+	case '9':
 		//POSITIVE Z
 		cameraAt.x = 10000.0f;
 		//cameraAt.y = 0.0f;
@@ -438,7 +451,7 @@ void keyboard(unsigned char key, int x, int y)
 		lookDirection(-90.0f,0.0f);
 	break;
 	
-	case '6':
+	case '0':
 		//NEGATIVE Z
 		cameraAt.x = 10000.0f;
 		//cameraAt.y = 0.0f;
@@ -661,6 +674,7 @@ void updateView()
 	terrainShader->updateViewMatrix(worldView);
 	skyboxShader->updateViewMatrix(worldView);
 	tigerShader->updateViewMatrix(worldView);
+	reflectSphere->updateViewMatrix(worldView);
 	//phongShader->updateViewMatrix(worldView);
 }
 
@@ -671,7 +685,29 @@ void updateAlternateView()
 	terrainShader->updateViewMatrix(worldView);
 	skyboxShader->updateViewMatrix(worldView);
 	tigerShader->updateViewMatrix(worldView);
+	reflectSphere->updateViewMatrix(worldView);
 	//phongShader->updateViewMatrix(worldView);
+}
+
+void updateFog()
+{
+	if (enableFog)
+	{
+		terrainShader->apply();
+		terrainShader->updateUniform("fog", 1.0f);
+		//tigerShader->apply();
+		//tigerShader->updateUniform("fog", 1.0f);
+		//reflectSphere->updateUniform("fog", 1.0f);
+	}
+	else
+	{
+		terrainShader->apply();
+		terrainShader->updateUniform("fog", 0.0f);
+		//tigerShader->apply();
+		//tigerShader->updateUniform("fog", 0.0f);
+		//reflectSphere->updateUniform("fog", 0.0f);
+	}
+	
 }
 
 void updateProjection(int width, int height)
@@ -683,6 +719,7 @@ void updateProjection(int width, int height)
 	terrainShader->updateProjectionMatrix(projection);
 	skyboxShader->updateProjectionMatrix(projection);
 	tigerShader->updateProjectionMatrix(projection);
+	reflectSphere->updateProjectionMatrix(projection);
 	//phongShader->updateProjectionMatrix(projection);
 }
 
@@ -733,14 +770,9 @@ void checkKeys(vec3 d, vec3 r)
 	if (active_keys['w'])
 	{
 		//cout << d << endl;
-		cameraEye += d;
-		cameraAt += d;
-		cameraEye += d;
-		cameraAt += d;
-		cameraEye += d;
-		cameraAt += d;
-		cameraEye += d;
-		cameraAt += d;
+		cameraEye += 3.0f*d;
+		cameraAt += 3.0f*d;
+		
 	}
 	else if (active_keys['s'])
 	{
@@ -818,9 +850,13 @@ void init ()
 	tigerShader->apply();
 	tiger = new ModelLoadedMesh("models/Tiger.obj");
 	
+	mat4 sphereWorld;
+	sphereWorld = translate(sphereWorld, vec3(60,100,185));
 	reflectSphere = new Shader("ReflectionSphere");
+	
+	reflectSphere->updateWorldMatrix(sphereWorld);
 	reflectSphere->apply();
-	cube = new Cube(10);
+	sphere = new Sphere(1000);
 	
 	
 	skyboxShader = new Shader("Skybox");

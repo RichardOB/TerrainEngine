@@ -13,6 +13,7 @@
 
 #include "Shader.h"
 #include "Cube.h"
+#include "Sphere.h"
 #include "Grid.h"
 #include "Terrain.h"
 #include "CubeMapTexture.h"
@@ -248,6 +249,8 @@ Mesh* grid = NULL;
 
 Mesh* cube = NULL;
 
+Mesh* sphere = NULL;
+
 Mesh* tiger = NULL;
 
 Skybox* skybox = NULL;
@@ -262,6 +265,7 @@ bool drawTerrain = true;
 bool drawSkyBox = true;
 bool drawTiger = true;
 bool useReflection = true;
+bool enableFog = true;
 	
 /*METHODS*/
 
@@ -322,6 +326,8 @@ updateView();
 
 void
 updateAlternateView();
+
+void updateFog();
 
 /**
  * Updates the current projection matrix used by the shaders (Uniform 'projection').
