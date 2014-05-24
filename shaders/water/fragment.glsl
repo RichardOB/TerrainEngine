@@ -5,7 +5,7 @@ layout(location=2) uniform samplerCube cubeMap2;
 
 const int sampleWidth = 1;
 
-const float Ka = 0.5f;
+const float Ka = 1.0f;
 const float Kd = 2f;
 
 in vec4 v_colour;
@@ -35,8 +35,9 @@ void main()
 
    float intensity = Ia  * Id;
 	
-	vec4 col = texture(cubeMap, reflection);
-   fragment = vec4(/*intensity*/ 0.8f * col);
+	//vec4 col = texture(cubeMap, reflection);
+	vec4 col = vec4(0.0f, 0.0f, 1.0f, 0.2f);
+   fragment = vec4(1.0f * col);
 
 	//vec3 col = texture(cubeMap, reflection);
 }

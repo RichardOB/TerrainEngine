@@ -243,6 +243,8 @@ Shader* tigerShader = NULL;
 
 Shader* reflectSphere = NULL;
 
+Shader* waterShader;
+
 Shader* shaders [3];
 
 Mesh* grid = NULL;
@@ -252,6 +254,8 @@ Mesh* cube = NULL;
 Mesh* sphere = NULL;
 
 Mesh* tiger = NULL;
+
+Mesh* waterPlane = NULL;
 
 Skybox* skybox = NULL;
 
@@ -264,6 +268,7 @@ CubeMap* reflection = NULL;
 bool drawTerrain = true;
 bool drawSkyBox = true;
 bool drawTiger = true;
+bool drawWater = true;
 bool useReflection = true;
 bool enableFog = true;
 	

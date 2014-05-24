@@ -40,12 +40,11 @@ void drawScene()
 {
 	updateFog();
 	
-	reflection->apply();
-	reflectSphere->apply();
-	sphere->draw();
+	
+	
 	
 	if(drawTerrain)
-	{
+	{	
 		terrainShader->apply();
 		grid->draw();
 	}
@@ -64,6 +63,9 @@ void drawScene()
 		}
 		tiger->draw();
 	}
+	
+	
+	
 	
 	if (drawSkyBox)
 	{
@@ -88,6 +90,17 @@ void drawScene()
 		glDepthFunc(OldDepthFuncMode);
 		#pragma GCC diagnostic pop
 	}
+	
+	if (drawWater)
+	{	//glDisable(GL_DEPTH_TEST);
+		waterShader->apply();
+		waterPlane->draw();
+		//glEnable(GL_DEPTH_TEST);
+	}
+	
+	reflection->apply();
+	reflectSphere->apply();
+	sphere->draw();
 }
 
 void writeToScreenShotBuffer()
@@ -675,6 +688,7 @@ void updateView()
 	skyboxShader->updateViewMatrix(worldView);
 	tigerShader->updateViewMatrix(worldView);
 	reflectSphere->updateViewMatrix(worldView);
+	waterShader->updateViewMatrix(worldView);
 	//phongShader->updateViewMatrix(worldView);
 }
 
@@ -686,6 +700,7 @@ void updateAlternateView()
 	skyboxShader->updateViewMatrix(worldView);
 	tigerShader->updateViewMatrix(worldView);
 	reflectSphere->updateViewMatrix(worldView);
+	waterShader->updateViewMatrix(worldView);
 	//phongShader->updateViewMatrix(worldView);
 }
 
@@ -720,6 +735,7 @@ void updateProjection(int width, int height)
 	skyboxShader->updateProjectionMatrix(projection);
 	tigerShader->updateProjectionMatrix(projection);
 	reflectSphere->updateProjectionMatrix(projection);
+	waterShader->updateProjectionMatrix(projection);
 	//phongShader->updateProjectionMatrix(projection);
 }
 
@@ -816,7 +832,8 @@ void init ()
 	//switch on Face Culling (Gets rid of faces looking away from us)
 	glEnable(GL_CULL_FACE);
 	
-	
+	glEnable(GL_BLEND);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//Switch openGL into wireframe drawing mode
 	//glPolygonMode(GL_FRONT, GL_LINE);
 	//glPolygonMode(GL_BACK, GL_LINE);
@@ -857,6 +874,13 @@ void init ()
 	reflectSphere->updateWorldMatrix(sphereWorld);
 	reflectSphere->apply();
 	sphere = new Sphere(1000);
+	
+	mat4 waterWorld;
+	waterWorld = translate(waterWorld, vec3(7.0f, 10.0f, 9.0f));
+	waterShader = new Shader("water");
+	waterShader->updateWorldMatrix(waterWorld);
+	waterShader->apply();
+	waterPlane = new Grid(1024, 100.0f);
 	
 	
 	skyboxShader = new Shader("Skybox");
