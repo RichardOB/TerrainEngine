@@ -26,35 +26,6 @@ out vec3 v_colour;
 out vec3 n;
 out vec3 l;
 
-vec3 pickColour(float height)
-{
-   if (height <= 15)
-   {
-      float idx = (height / 50.0f) * 0.25;
-      //return texture(tex, vec2(idx, 0.25));
-	return vec3(0.4f, 0.0f, 1.0f);
-   }
-   else if (height <= 30)
-   {
-      float idx = ((height - 50.0f) / 25.0f) * 0.25f + 0.25f;
-     // return texture(tex, vec2(idx, 0.25));
-	return vec3(0.9f, 0.84f, 0.68f);
-	   
-   }
-   else if (height <= 50)
-   {
-      float idx = ((height - 75.0f) / 75.0f) * 0.25f + 0.5f;
-      //return texture(tex, vec2(idx, 0.75));
-	   return vec3(0.2f, 0.82f, 0.21f);
-   }
-   else
-   {
-      float idx = ((height - 150.0f) / 100.0f) * 0.25f + 0.75f;
-      //return texture(tex, vec2(idx, 0.75));
-	   return vec3(0.47f, 0.53f, 0.6f);
-   }
-}
-
 void main()
 {
 	

@@ -20,6 +20,7 @@
 #include "Skybox.h"
 #include "ModelLoadedMesh.h"
 #include "ColourBuffer.h"
+#include "CubeMap.h"
 
 using glm::mat4;
 using glm::vec3;
@@ -239,6 +240,8 @@ Shader* gridShader = NULL;
 
 Shader* tigerShader = NULL;
 
+Shader* reflectSphere = NULL;
+
 Shader* shaders [3];
 
 Mesh* grid = NULL;
@@ -251,11 +254,14 @@ Skybox* skybox = NULL;
 
 ColourBuffer* screenShot = NULL;
 
+CubeMap* reflection = NULL;
+
 /* Toggle Draw Methods */
 
 bool drawTerrain = true;
 bool drawSkyBox = true;
 bool drawTiger = true;
+bool useReflection = true;
 	
 /*METHODS*/
 
@@ -265,6 +271,8 @@ bool drawTiger = true;
 void display();
 
 void drawScene();
+
+void writeToScreenShotBuffer();
 
 void writeToCubeMapBuffer();
 
@@ -281,6 +289,8 @@ void keyboard(unsigned char, int, int);
 void mouse(int, int, int, int);
 
 void lookDirection(GLfloat, GLfloat);
+
+void changeViewDirection(GLfloat hRotation, GLfloat vRotation);
 
 void mouseLook (int x, int y);
 

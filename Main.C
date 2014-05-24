@@ -11,11 +11,12 @@ void display ()
 	//Clear the screen
 	//Clears both the screen's colour and the depth of anything it is displaying
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	writeToCubeMapBuffer();
 	
 	
-	
-	
+	if (useReflection)
+	{
+		writeToCubeMapBuffer();
+	}
 	
 	drawScene();
 	
@@ -32,6 +33,9 @@ void display ()
 
 void drawScene()
 {
+
+	reflectSphere->apply();
+	cube->draw();
 	
 	if(drawTerrain)
 	{
@@ -70,7 +74,7 @@ void drawScene()
 	}
 }
 
-void writeToCubeMapBuffer()
+void writeToScreenShotBuffer()
 {
 	screenShot->bind();
 	FOVY = 90.0f;
@@ -85,6 +89,128 @@ void writeToCubeMapBuffer()
 	
 	FOVY = 45.0f;
 	
+	updateView();
+}
+
+void writeToCubeMapBuffer()
+{
+	reflection->bind();
+	
+	//Set altCameraEye to position of object!!******
+	FOVY = 90.0f;
+	
+	updateProjection(1,1);
+	
+	//Generate and bind 6 textures
+	for (int i = 0; i < 6; i ++)
+	{
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		
+		switch(i)
+		{
+			case 0:
+				//POSITIVE X
+				altCameraAt.x = 10000.0f;
+				altCameraAt.y = altCameraEye.y;
+				altCameraAt.z = altCameraEye.z;
+				
+				//changeViewDirection(-10.0f,0.0f);
+			
+				updateAlternateView();
+				reflection->attachToNewTexture(0);
+				drawScene();
+			
+				//reflection->write(1);
+			break;
+			
+			case 1:
+				//NEGATIVE X
+				altCameraAt.x = -10000.0f;
+				altCameraAt.y = altCameraEye.y;
+				altCameraAt.z = altCameraEye.z;
+			
+				updateAlternateView();
+				reflection->attachToNewTexture(1);
+				drawScene();
+			break;
+			
+			case 2:
+				//POSITIVE Y
+				altCameraAt.x = 10000.0f;
+				altCameraAt.y = altCameraEye.y;
+				altCameraAt.z = altCameraEye.z;
+	
+				changeViewDirection(0.0f,89.5f);
+			
+				updateAlternateView();
+				reflection->attachToNewTexture(2);
+				drawScene();
+			
+				//reflection->write(3);
+				
+			break;
+			
+			case 3:
+				//NEGATIVE Y
+				altCameraAt.x = 10000.0f;
+				altCameraAt.y = altCameraEye.y;
+				altCameraAt.z = altCameraEye.z;
+	
+				changeViewDirection(0.0f,-89.50f);
+			
+				updateAlternateView();
+				reflection->attachToNewTexture(3);
+				drawScene();
+				
+			break;
+			
+			case 4:
+				//POSITIVE Z
+				altCameraAt.x = 10000.0f;
+				altCameraAt.y = altCameraEye.y;
+				altCameraAt.z = altCameraEye.z;
+	
+				changeViewDirection(-90.0f,0.0f);
+			
+				updateAlternateView();
+				reflection->attachToNewTexture(4);
+				drawScene();
+			
+				//reflection->write(5);
+			
+				
+			break;
+			
+			case 5:
+				//NEGATIVE Z
+				altCameraAt.x = 10000.0f;
+				altCameraAt.y = altCameraEye.y;
+				altCameraAt.z = altCameraEye.z;
+	
+				changeViewDirection(90.0f,0.0f);
+			
+				updateAlternateView();
+				reflection->attachToNewTexture(5);
+				drawScene();
+				
+			break;
+			
+			default:
+				cout << "[ERROR] Cannot create that face number when writing to CubeMapBuffer in Main.C" << endl;
+			break;
+		}
+	}
+	
+	for(int i = 0; i < 6; i++)
+	{
+		reflection->attachToNewTexture(i);
+		reflection->write(i+1);
+	}
+	
+	reflection->unbind();
+	
+	FOVY = 45.0f;
 	updateView();
 }
 
@@ -347,7 +473,7 @@ void keyboard(unsigned char key, int x, int y)
 	break;
 	
 	case 'p':
-		writeToCubeMapBuffer();
+	writeToScreenShotBuffer();
          screenShot->bind();
          screenShot->write();
          screenShot->unbind();
@@ -431,6 +557,22 @@ void lookDirection(GLfloat hRotation, GLfloat vRotation)
 	cameraAt = cameraEye + vec3(d.x, d.y, d.z);
 }
 
+void changeViewDirection(GLfloat hRotation, GLfloat vRotation)
+{
+	vec3 direction = (altCameraAt - altCameraEye);
+	vec3 right = glm::cross(direction, altCameraUp);
+	
+	mat4 rotation; //create empty 4x4 rotation matrix
+	rotation = glm::rotate (rotation, hRotation, cameraUp);
+	rotation = glm::rotate (rotation, vRotation, right);
+	
+	glm::vec4 d (direction.x, direction.y, direction.z, 0.0f);//create a vec4 direction vector so that we can rotate it
+	
+	d = rotation * d;
+	
+	altCameraAt = altCameraEye + vec3(d.x, d.y, d.z);
+}
+
 void mouseLook (int x, int y)
 {
 	int horizontal_centre = WINDOW_WIDTH / 2;
@@ -486,11 +628,17 @@ void reshape(int newWidth, int newHeight)
 	//Fix our viewport
 	glViewport (0, 0, newWidth, newHeight);
 	
-	/*if (screenShot != NULL)
+	if (screenShot != NULL)
 	{
 		delete screenShot;
-	}*/
+	}
 	screenShot = new ColourBuffer(newWidth, newHeight);
+	
+	if (reflection != NULL)
+	{
+		delete reflection;
+	}
+	reflection = new CubeMap(newWidth, newHeight);
 	//screenShot->unbind();
 	
 	//Ask GLUT for a redraw. Tells GLUT to call display function
@@ -669,6 +817,10 @@ void init ()
 	tigerShader->updateWorldMatrix(tigerWorld);
 	tigerShader->apply();
 	tiger = new ModelLoadedMesh("models/Tiger.obj");
+	
+	reflectSphere = new Shader("ReflectionSphere");
+	reflectSphere->apply();
+	cube = new Cube(10);
 	
 	
 	skyboxShader = new Shader("Skybox");

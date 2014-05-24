@@ -114,7 +114,7 @@ write()
          index += 4;
       }
    }
-   image.write("rgb.png");
+   image.write("screenshot.png");
    
    unbind();
 
