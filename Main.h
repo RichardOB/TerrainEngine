@@ -22,6 +22,7 @@
 #include "ModelLoadedMesh.h"
 #include "ColourBuffer.h"
 #include "CubeMap.h"
+#include "Board.h"
 
 using glm::mat4;
 using glm::vec3;
@@ -247,6 +248,8 @@ Shader* reflectSphere = NULL;
 
 Shader* waterShader;
 
+Shader* grassShader;
+
 Shader* shaders [3];
 
 Mesh* grid = NULL;
@@ -259,11 +262,21 @@ Mesh* tiger = NULL;
 
 Mesh* waterPlane = NULL;
 
+Mesh* grassPlane = NULL;
+
 Skybox* skybox = NULL;
 
 ColourBuffer* screenShot = NULL;
 
 CubeMap* reflection = NULL;
+
+CubeMapTexture* daySkyBox = NULL;
+
+CubeMapTexture* nightSkyBox = NULL;
+
+Texture* waterTex = NULL;
+
+Texture* grassTex = NULL;
 
 /* Toggle Draw Methods */
 
@@ -272,7 +285,7 @@ bool drawSkyBox = true;
 bool drawTiger = true;
 bool drawWater = true;
 bool useReflection = true;
-bool enableFog = true;
+bool enableFog = false;
 	
 /*METHODS*/
 

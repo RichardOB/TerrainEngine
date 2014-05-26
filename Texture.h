@@ -33,7 +33,7 @@ class Texture
         *
         * Obtains directory name containing desired textures, aswell as the texture filenames themselves.
         */
-	Texture(const string& directory, const string& texName);
+	Texture(const string& directory, const string& texName, bool rgba);
 
       /**
         * Destructor.
@@ -50,12 +50,16 @@ class Texture
    private:
 	   
 	unsigned char* loadTextureFromPNG(const string fileName, int& w, int& h);
+   
+	GLubyte*  loadTextureRGBAFromPNG(const string fileName, int& w, int& h);
       
 	string fileName;
    
 	GLuint textureHandle;
    
-	GLenum textureUnit;
+	//GLenum textureUnit;
+   
+	bool rgba;
    
 };
 

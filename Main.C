@@ -40,9 +40,26 @@ void drawScene()
 {
 	updateFog();
 	
-	
-	
-	
+	glDisable(GL_CULL_FACE);
+	mat4 grassWorld;
+	for (float i = 0; i < 1024; i += 0.5f)
+	{
+		mat4 grassWorld;
+		grassWorld = translate(grassWorld, vec3(i,500.0f,i));
+		grassShader->apply();
+		grassShader->updateWorldMatrix(grassWorld);
+		grassPlane->draw(); 
+	}
+	/*mat4 grassWorld;
+	grassWorld = translate(grassWorld, vec3(1.0f, 0.0f, 1.0f));
+	grassShader->apply();
+	grassShader->updateWorldMatrix(grassWorld);
+	grassPlane->draw(); 
+	grassWorld = translate(grassWorld, vec3(2.0f, 2.0f, 2.0f));
+	grassShader->updateWorldMatrix(grassWorld);
+	grassPlane->draw(); */
+	glEnable(GL_CULL_FACE);
+
 	if(drawTerrain)
 	{	
 		terrainShader->apply();
@@ -63,9 +80,6 @@ void drawScene()
 		}
 		tiger->draw();
 	}
-	
-	
-	
 	
 	if (drawSkyBox)
 	{
@@ -92,9 +106,13 @@ void drawScene()
 		glDepthFunc(OldDepthFuncMode);
 		#pragma GCC diagnostic pop
 	}
+	//glDisable(GL_CULL_FACE);
+	
+	//glEnable(GL_CULL_FACE);
 	
 	if (drawWater)
 	{	//glDisable(GL_DEPTH_TEST);
+		glDisable(GL_CULL_FACE);
 		waterShader->apply();
 		if (enableFog)
 		{
@@ -106,12 +124,30 @@ void drawScene()
 		}
 		waterPlane->draw();
 		//glEnable(GL_DEPTH_TEST);
+		
+		
+		
+		glEnable(GL_CULL_FACE);
 	}
+	
+	
 	
 	reflection->apply();
 	reflectSphere->apply();
 	reflectSphere->updateUniform("mixRatio", mixRatio);
+	
 	sphere->draw();
+	
+	/*glDisable(GL_CULL_FACE);
+	glRasterPos3f(30.0f, 25.0f, 0.0f);
+	string s = "Hello";
+	for( int i = 0; i < s.length(); i++)
+	{
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, s[i]);
+		//cout << GLUT_BITMAP_HELVETICA_18 << endl;
+	}
+	glEnable(GL_CULL_FACE);*/
+	
 }
 
 void writeToScreenShotBuffer()
@@ -708,6 +744,7 @@ void updateView()
 	tigerShader->updateViewMatrix(worldView);
 	reflectSphere->updateViewMatrix(worldView);
 	waterShader->updateViewMatrix(worldView);
+	grassShader->updateViewMatrix(worldView);
 	//phongShader->updateViewMatrix(worldView);
 }
 
@@ -720,6 +757,7 @@ void updateAlternateView()
 	tigerShader->updateViewMatrix(worldView);
 	reflectSphere->updateViewMatrix(worldView);
 	waterShader->updateViewMatrix(worldView);
+	grassShader->updateViewMatrix(worldView);
 	//phongShader->updateViewMatrix(worldView);
 }
 
@@ -755,6 +793,7 @@ void updateProjection(int width, int height)
 	tigerShader->updateProjectionMatrix(projection);
 	reflectSphere->updateProjectionMatrix(projection);
 	waterShader->updateProjectionMatrix(projection);
+	grassShader->updateProjectionMatrix(projection);
 	//phongShader->updateProjectionMatrix(projection);
 }
 
@@ -864,14 +903,7 @@ void init ()
 	//loadShaderPrograms();
 	//flatShader = new Shader("terrain");
 
-	//CubeMapTexture* t = new CubeMapTexture("textures/skybox", "terrain_positive_x.png", "terrain_negative_x.png", "terrain_positive_y.png", "terrain_negative_y.png", "terrain_positive_z.png", "terrain_negative_z.png");
-	glActiveTexture(GL_TEXTURE1);
-	CubeMapTexture* t = new CubeMapTexture("textures/skybox", "dunes_positive_x.png", "dunes_negative_x.png", "dunes_positive_y.png", "dunes_negative_y.png", "dunes_positive_z.png", "dunes_negative_z.png");
-	t->load();
 	
-	glActiveTexture(GL_TEXTURE0);
-	CubeMapTexture* t2 = new CubeMapTexture("textures/skybox", "evening_dunes_positive_x.png", "evening_dunes_negative_x.png", "evening_dunes_positive_y.png", "evening_dunes_negative_y.png", "evening_dunes_positive_z.png", "evening_dunes_negative_z.png");
-	t2->load();
 	
 	terrainShader = new Shader("Grid");
 	terrainShader->apply();
@@ -882,8 +914,8 @@ void init ()
 	tigerWorld = translate(tigerWorld, vec3(60,83,185));
 	tigerWorld = scale(tigerWorld, vec3(0.015f,0.015f,0.015f));
 	
-	Texture* tex = new Texture("textures/bricks", "bricks.png"); 
-	tex->load();
+	//Texture* tex = new Texture("textures/bricks", "bricks.png"); 
+	//tex->load();
 	tigerShader = new Shader("palm");
 	tigerShader->updateWorldMatrix(tigerWorld);
 	tigerShader->apply();
@@ -900,10 +932,20 @@ void init ()
 	
 	mat4 waterWorld;
 	waterWorld = translate(waterWorld, vec3(7.0f, 10.0f, 9.0f));
+	//waterWorld = translate(waterWorld, vec3(7.0f, 65.0f, 9.0f));
 	waterShader = new Shader("water");
 	waterShader->updateWorldMatrix(waterWorld);
 	waterShader->apply();
 	waterPlane = new Grid(1024, 100.0f);
+	
+	mat4 grassWorld;
+	grassWorld = translate(grassWorld, vec3(1.0f, 0.0f, 1.0f));
+	//grassWorld = scale(grassWorld, vec3(4.0f, 50.0f,4.0f));
+	grassShader = new Shader("water2");
+	grassShader->updateWorldMatrix(grassWorld);
+	grassShader->apply();
+	grassPlane = new Board(2.0f, 2.0f, 2.0f); 
+	//grassPlane = new Grid(10.0f, 1.0f); 
 	
 	
 	skyboxShader = new Shader("Skybox");
@@ -914,15 +956,27 @@ void init ()
 	skyboxShader->apply();
 	cube = new Cube(20);
 	
-	
-	//skybox = new Skybox(cameraEye);
-	
+	//CubeMapTexture* t = new CubeMapTexture("textures/skybox", "terrain_positive_x.png", "terrain_negative_x.png", "terrain_positive_y.png", "terrain_negative_y.png", "terrain_positive_z.png", "terrain_negative_z.png");
 	
 	
-	//phongShader  = new Shader ("Grid");
-	//phongShader->apply();
+	glActiveTexture(GL_TEXTURE2);
+	waterTex = new Texture("textures/skybox", "evening_dunes_positive_y.png", false); 
+	//waterTex->load();
 	
-	//cube = new Cube();
+	glActiveTexture(GL_TEXTURE3);
+	grassTex = new Texture("textures/grass", "grass2.png", true); 
+	//cout << "Finished making texture" << endl;
+	//grassTex->load();
+	
+	glActiveTexture(GL_TEXTURE1);
+	daySkyBox = new CubeMapTexture("textures/skybox", "dunes_positive_x.png", "dunes_negative_x.png", "dunes_positive_y.png", "dunes_negative_y.png", "dunes_positive_z.png", "dunes_negative_z.png");
+	daySkyBox->load();
+	
+	glActiveTexture(GL_TEXTURE0);
+	nightSkyBox = new CubeMapTexture("textures/skybox", "evening_dunes_positive_x.png", "evening_dunes_negative_x.png", "evening_dunes_positive_y.png", "evening_dunes_negative_y.png", "evening_dunes_positive_z.png", "evening_dunes_negative_z.png");
+	nightSkyBox->load();
+	
+	
 
 	updateProjection(WINDOW_WIDTH, WINDOW_HEIGHT);
 	updateView();

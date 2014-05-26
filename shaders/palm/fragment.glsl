@@ -1,6 +1,6 @@
 #version 430
 
-layout(location=1) uniform sampler2D tex;
+layout(binding=2) uniform sampler2D tex;
 
 const int sampleWidth = 1;
 
@@ -28,13 +28,13 @@ void main()
 	//Constrain the fog factor between 0 and 1
 	fog_fac = clamp (fog_fac, 0.0, 1.0);
 	
-   float Ia = Ka;
-   float Id = Kd * max(dot(v_normal, v_lightDir), 0);
+	float Ia = Ka;
+	float Id = Kd * max(dot(v_normal, v_lightDir), 0);
 
 	
-   vec4 col = texture(tex, TexCoord);
-   float intensity = Ia /*+ shadow*/ * Id;
-   //fragment = vec4(intensity * col.xyz, 1.0f);
+	vec4 col = texture(tex, TexCoord);
+	float intensity = Ia /*+ shadow*/ * Id;
+	//fragment = vec4(intensity * col.xyz, 1.0f);
 	vec4 f_col = vec4(intensity * col.xyz, 1.0f);
 	
 	fragment = mix(f_col, fog_colour, fog_fac);

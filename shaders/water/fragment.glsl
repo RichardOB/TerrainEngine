@@ -1,7 +1,6 @@
 #version 430
 
-layout(location=1) uniform samplerCube cubeMap;
-layout(location=2) uniform samplerCube cubeMap2;
+layout(location=2) uniform sampler2D tex;
 
 const int sampleWidth = 1;
 
@@ -37,7 +36,10 @@ void main()
 	
 	//vec4 col = texture(cubeMap, reflection);
 	vec4 col = vec4(0.0f, 0.0f, 1.0f, 0.2f);
-   fragment = vec4(1.0f * col);
+	vec4 col2 = texture(tex, vec2(0.5f, 0.5f));
+   
+   //fragment = vec4(1.0f * mix(col, col2, 1.0f));
+	fragment = vec4(1.0f * col);
 
 	//vec3 col = texture(cubeMap, reflection);
 }

@@ -30,13 +30,13 @@ const mat4 bias = mat4(.5f, .0f, .0f, .0f,
 
 void main()
 {
-   gl_Position = projection * view * world * vec4(position, 1.0f);
-   //v_light = bias * lightProj * lightView * world * vec4(position, 1.0f);
-   v_colour = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-   v_normal = normals;
+	gl_Position = projection * view * world * vec4(position, 1.0f);
+	//v_light = bias * lightProj * lightView * world * vec4(position, 1.0f);
+	v_colour = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	v_normal = normals;
 	
-   vec4 surface_pos_eye =  view * world * vec4(position, 1.0f);
-  distance = length(-surface_pos_eye);
+	vec4 surface_pos_eye =  view * world * vec4(position, 1.0f);
+	distance = length(-surface_pos_eye);
 	
 	if (fog == 0.0f)
 	{
@@ -44,9 +44,9 @@ void main()
 	}
  
 
-TexCoord = uv;
+	TexCoord = uv;
 
-   vec3 lightPos = vec3(300.0f, 300.0f, 300.0f);
-   v_lightDir = normalize(lightPos - (world * vec4(position, 1.0f)).xyz);
+	vec3 lightPos = vec3(300.0f, 300.0f, 300.0f);
+	v_lightDir = normalize(lightPos - (world * vec4(position, 1.0f)).xyz);
 }
 
