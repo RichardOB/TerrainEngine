@@ -1,6 +1,6 @@
 #version 420
 
-//layout(binding=6) uniform sampler2DShadow shadowMap;
+layout(binding=4) uniform sampler2D tex;
 
 //const int sampleWidth = 1;
 
@@ -16,6 +16,7 @@ in vec3 l;
 //in vec4 v_light;
 //in vec3 v_lightDir;
 in float distance;
+in vec2 texCoords;
 
 //out vec4 fragment;
 out vec4 fragment;
@@ -33,7 +34,7 @@ void main()
 	//Constrain the fog factor between 0 and 1
 	fog_fac = clamp (fog_fac, 0.0, 1.0);
 	
-	float ambientCoefficient = 0.1f;
+	float ambientCoefficient = 0.2f;
 	float diffuseCoefficient = 0.8f;
 	
 	float ambient = ambientCoefficient;
@@ -41,7 +42,10 @@ void main()
 	
 	float intensity = ambient + diffuse;
 	
-	vec4  f_col = vec4(v_colour * intensity, 1.0f); //with alpha value added. For now it is left to completely opaque.
+	vec4 texColour = texture(tex,  texCoords);
+	
+	//vec4  f_col = vec4(v_colour * intensity, 1.0f); //with alpha value added. For now it is left to completely opaque.
+	vec4 f_col = vec4(texColour.xyz * intensity, 1.0f);
 	
 	if (gamma == 1.0f)
 	{

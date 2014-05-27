@@ -62,6 +62,8 @@ class Terrain: public Mesh
    
    float* getCoord(unsigned x, unsigned z);
    
+   void smoothNormals(float* vertices);
+   
    void smoothVertices();
    
    void smoothPNG();
@@ -94,6 +96,8 @@ float* getRGB(int x, int z);
    float** heights;
    
    float* coords;
+   
+   float* normals;
    
     
 

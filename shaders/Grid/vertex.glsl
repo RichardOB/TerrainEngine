@@ -2,6 +2,8 @@
 
 layout (location=1) in vec3 position;
 layout (location=2) in vec3 colour;
+layout (location=3) in vec3 normals; 
+layout (location=4) in vec2 uv;
 //layout (location=2) in vec3 normal;
 
 //layout(binding=0) uniform sampler2D tex;
@@ -18,6 +20,7 @@ uniform float fog;
 out vec3 v_colour;
 out vec3 n;
 out vec3 l;
+out vec2 texCoords;
 
 out float distance;
 
@@ -33,7 +36,7 @@ void main()
 	
 	vec3 pos = normalize(position);
 	vec4 worldPos = world * vec4(pos, 1.0f);
-	n = worldPos.xyz;
+	n = normals;
 	
 	vec4 surface_pos_eye =  view * world * vec4(position, 1.0f);
 	distance = length(-surface_pos_eye);
@@ -49,7 +52,7 @@ void main()
 	//find the direction vector to the light source (normalize it since we only need direction)
 	l = normalize(light - worldPos).xyz;
 
-	
+	texCoords = uv;
 }
 
 

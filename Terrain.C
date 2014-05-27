@@ -8,7 +8,8 @@ Terrain(string heightMapName):
 	heightMap(heightMapName.c_str()),
 	_indexCount(0),
 	 vertices(),
-	 coords()
+	 coords(),
+	 normals()
 {
 	width = heightMap.get_width();
 	height = heightMap.get_height();
@@ -29,6 +30,9 @@ Terrain(string heightMapName):
    const unsigned VERTEX_ARRAY_SIZE = (unsigned)_vertexCount *
       VERTEX_COMPONENT_COUNT;
    float* vertices = new float[VERTEX_ARRAY_SIZE];
+   normals = new float[VERTEX_ARRAY_SIZE];
+	
+   float* uv = new float [_vertexCount  * 2];
 
    const unsigned SQUARES = height * width;
    const unsigned TRIANGLES_PER_SQUARE = 2;
@@ -39,6 +43,7 @@ Terrain(string heightMapName):
 
    const unsigned INDEX_ARRAY_SIZE = (unsigned)_indexCount;
    GLuint* indices = new GLuint[INDEX_ARRAY_SIZE];
+   GLuint* uvIndices = new GLuint[_indexCount];
    
    cout << "width: " << width << endl;
    cout << "height: " << height << endl; 
@@ -49,6 +54,7 @@ Terrain(string heightMapName):
    
    unsigned index = 0;
    unsigned index2 = 0;
+   unsigned uvIndex = 0;
    for (unsigned z = 0; z < VERTICES_PER_COL; z++)
    {
       const float Z = (float)z * Z_DELTA;
@@ -57,11 +63,11 @@ Terrain(string heightMapName):
       {
          const float X = (float)x * X_DELTA;
 
-         vertices[index++] = X;
+	vertices[index++] = X;
 	//cout << "Height: " << ((float)heightMap.get_pixel(x, z).red / 255.0f) * 250.0f;;
         // vertices[index++] =  ((float)heightMap.get_pixel(x, z).red / width) * 500.0f;
-	 vertices[index++] =  heights[x][z];
-         vertices[index++] = Z;
+	vertices[index++] =  heights[x][z];
+	vertices[index++] = Z;
 	
 		if(x < 60 && x > 20 && z > 160 && z < 230 && heights[x][z] > 10.0f)
 		{
@@ -71,6 +77,8 @@ Terrain(string heightMapName):
 			coords[index2++] = heights[x][z];
 			coords[index2++] = Z;
 		}
+	uv[uvIndex++] = 1.0f/width * x;
+	uv[uvIndex++] = 1.0f/height * z;
       }
    }
    cout << "Count: " << count << endl;
@@ -78,6 +86,7 @@ Terrain(string heightMapName):
  //  cout << "Size of vertices: " << size << endl;
    
    index = 0;
+   uvIndex = 0;
    for (unsigned z = 0; z < VERTICES_PER_COL - 1; z++)
    {
       for (unsigned x = 0; x < VERTICES_PER_ROW - 1; x++)
@@ -93,13 +102,25 @@ Terrain(string heightMapName):
          indices[index++] = i + 1;
          indices[index++] = i + VERTICES_PER_ROW;
          indices[index++] = i + 1 + VERTICES_PER_ROW;
+	      
+	      /* Top left square. */
+	uvIndices[uvIndex++] = i;
+	uvIndices[uvIndex++] = i + VERTICES_PER_ROW;
+	uvIndices[uvIndex++] = i + 1;
+
+         /* Bottom right square. */
+	uvIndices[uvIndex++] = i + 1;
+	uvIndices[uvIndex++] = i + VERTICES_PER_ROW;
+	uvIndices[uvIndex++] = i + 1 + VERTICES_PER_ROW;
       }
    }
 
+   smoothNormals(vertices);
+   
    bind();
 
-   GLuint buffers[2];
-   glGenBuffers(2, buffers);
+   GLuint buffers[6];
+   glGenBuffers(6, buffers);
 
    glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
    glBufferData(GL_ARRAY_BUFFER, VERTEX_ARRAY_SIZE * (GLsizei)sizeof(float),
@@ -112,6 +133,33 @@ Terrain(string heightMapName):
    GLuint positionLocation = findAttribute("position");
    glEnableVertexAttribArray(positionLocation);
    glVertexAttribPointer(positionLocation, VERTEX_COMPONENT_COUNT, GL_FLOAT,
+         GL_FALSE, 0, 0);
+   
+   
+    glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
+   glBufferData(GL_ARRAY_BUFFER, VERTEX_ARRAY_SIZE * (GLsizei)sizeof(float),
+         normals, GL_STATIC_DRAW);
+
+   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[3]);
+   glBufferData(GL_ELEMENT_ARRAY_BUFFER, INDEX_ARRAY_SIZE * (GLsizei)sizeof(GLuint),
+         indices, GL_STATIC_DRAW);
+
+   GLuint normalsLocation = findAttribute("normals");
+   glEnableVertexAttribArray(normalsLocation);
+   glVertexAttribPointer(normalsLocation, VERTEX_COMPONENT_COUNT, GL_FLOAT,
+         GL_FALSE, 0, 0);
+	 
+   glBindBuffer(GL_ARRAY_BUFFER, buffers[4]);
+   glBufferData(GL_ARRAY_BUFFER, _vertexCount  * 2 * (GLsizei)sizeof(float),
+         uv, GL_STATIC_DRAW);
+
+   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[5]);
+   glBufferData(GL_ELEMENT_ARRAY_BUFFER, INDEX_ARRAY_SIZE * (GLsizei)sizeof(GLuint),
+	uvIndices, GL_STATIC_DRAW);
+
+   GLuint uvLocation = findAttribute("uv");
+   glEnableVertexAttribArray(uvLocation);
+   glVertexAttribPointer(uvLocation, 2, GL_FLOAT,
          GL_FALSE, 0, 0);
 }
 
@@ -130,6 +178,51 @@ Terrain(string heightMapName):
 		{
 			heights[z][x] =  ((float)heightMap.get_pixel(x, z).red / width) * 400.0f;
 		}
+	}
+}
+
+void Terrain::smoothNormals(float* vertices)
+{
+	cout << "Vertices Size: " << (sizeof(vertices)/sizeof(*vertices)) << endl;
+	int row;
+	int col;
+	
+	for (unsigned h= 1; h < height - 1;h++)
+	{
+	      unsigned indexStep = (h * width + 1) * 3;
+	      for (unsigned w = 1; w < width - 1; w++)
+	      {
+		row = width * 3, col = 3;
+		int x = indexStep, y = indexStep+1, z = indexStep+2;
+		 
+		vec3 centre = vec3(vertices[x],vertices[y], vertices[z]);
+		 
+		vec3 top = vec3(vertices[x+ row],vertices[y+ row],vertices[z+ row]);
+		 
+		vec3 left = vec3(vertices[x-col],vertices[y-col],vertices[z-col]);
+		 
+		vec3 right = vec3(vertices[x+col],vertices[y+col],vertices[z+col]);
+		 
+		vec3 bottom = vec3(vertices[x-row],vertices[y-row],vertices[z-row]);
+
+		 vec3 tEdge = top - centre;
+		 vec3 bEdge = bottom - centre;
+		 vec3 lEdge = left - centre;
+		 vec3 rEdge = right - centre;
+		 
+		 
+		vec3 sNormal =( 
+		normalize(cross(tEdge, rEdge)) + 
+		normalize(cross(bEdge, lEdge))+
+		normalize(cross(lEdge, tEdge))+ 
+		normalize(cross(rEdge, bEdge))
+		 )/4.0f;
+
+		normals[indexStep++] = sNormal.x;
+		normals[indexStep++] = sNormal.y;
+		normals[indexStep++] = sNormal.z;
+		 
+	      }
 	}
 }
 

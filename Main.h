@@ -287,6 +287,8 @@ Texture* waterTex = NULL;
 
 Texture* grassTex = NULL;
 
+Texture* sandTex = NULL;
+
 float* grassCoordinates;
 
 float grassAnimation = 0.0f;

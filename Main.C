@@ -1076,6 +1076,9 @@ void init ()
 	
 	glActiveTexture(GL_TEXTURE3);
 	grassTex = new Texture("textures/grass", "grass2.png", true); 
+	
+	glActiveTexture(GL_TEXTURE4);
+	sandTex = new Texture("textures/sand", "sand_texture.png", false); 
 	//cout << "Finished making texture" << endl;
 	//grassTex->load();
 	
