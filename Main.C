@@ -495,6 +495,7 @@ void keyboard(unsigned char key, int x, int y)
 		if (!anti_alias)
 		{
 			cout << "Applying anti-aliasing" << endl;
+			glEnable(GL_MULTISAMPLE);
 			glEnable(GL_POINT_SMOOTH);
 			glEnable(GL_LINE_SMOOTH);
 			//glEnable(GL_POLYGON_SMOOTH);
@@ -504,6 +505,7 @@ void keyboard(unsigned char key, int x, int y)
 		else if (anti_alias)
 		{
 			cout << "Disabling anti-aliasing" << endl;
+			glDisable(GL_MULTISAMPLE);
 			glDisable(GL_POINT_SMOOTH);
 			glDisable(GL_LINE_SMOOTH);
 			//glDisable(GL_POLYGON_SMOOTH);
@@ -1158,7 +1160,7 @@ int main (int argc, char** argv)
 	//Use two buffers to prevent screen tearing, 
 	//use a depth buffer to work in 3D, 
 	//and use a colour screen
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_MULTISAMPLE);
 	
 	//glutInitWindowSize(640, 480); //Size of the window we would like
 	glutInitWindowSize(1280, 960);
