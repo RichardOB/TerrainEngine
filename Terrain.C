@@ -63,13 +63,13 @@ Terrain(string heightMapName):
 	 vertices[index++] =  heights[x][z];
          vertices[index++] = Z;
 	
-		if(x < 60 && x > 20 && z > 160 && z < 230)
+		if(x < 60 && x > 20 && z > 160 && z < 230 && heights[x][z] > 10.0f)
 		{
 			count ++;
 			cout << "(" << X << "," << heights[x][z] << "," << Z << ")" << endl;
-			coords[index2++] = X/2;
-			coords[index2++] = heights[x/2][z/2];
-			coords[index2++] = Z/2;
+			coords[index2++] = X;
+			coords[index2++] = heights[x][z];
+			coords[index2++] = Z;
 		}
       }
    }

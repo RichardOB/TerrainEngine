@@ -44,36 +44,21 @@ void drawScene()
 	{
 		glDisable(GL_CULL_FACE);
 		mat4 grassWorld;
-		/*for (float i = 0; i < 2760; i += 0.5f)
-		{
-			mat4 grassWorld;
-			grassWorld = translate(grassWorld, vec3(i,500.0f,i));
-			grassShader->apply();
-			grassShader->updateWorldMatrix(grassWorld);
-			grassPlane->draw(); 
-		}*/
-		
-		/*for(int i = 0; i < 2760 * 3; i+=3)
-		{
-			cout<<"coords in main: "  << grassCoordinates[i] <<"," << grassCoordinates[i+1] <<","  << grassCoordinates[i+2] << endl;
-		}*/
 		for (int i = 0; i < 2760 * 3; i+=3)
 		{
 			mat4 grassWorld;
-			grassWorld = translate(grassWorld, vec3(grassCoordinates[i],grassCoordinates[i+1],grassCoordinates[i+2]));
+			grassWorld = translate(grassWorld, vec3(grassCoordinates[i],grassCoordinates[i+1] -1.5f,grassCoordinates[i+2]));
+			
+			if (useGrassAnimation)
+			{
+				grassWorld = rotate(grassWorld, grassAnimation, vec3(0,0,1));	
+			}
+			
 			grassShader->apply();
 			grassShader->updateWorldMatrix(grassWorld);
 			grassPlane->draw(); 
 			//cout << "Grass Pos: (" << grassCoordinates[i] << "," << grassCoordinates[i+1] << "," << grassCoordinates[i+2] << ")" << endl;
 		}
-		/*mat4 grassWorld;
-		grassWorld = translate(grassWorld, vec3(1.0f, 0.0f, 1.0f));
-		grassShader->apply();
-		grassShader->updateWorldMatrix(grassWorld);
-		grassPlane->draw(); 
-		grassWorld = translate(grassWorld, vec3(2.0f, 2.0f, 2.0f));
-		grassShader->updateWorldMatrix(grassWorld);
-		grassPlane->draw(); */
 		glEnable(GL_CULL_FACE);
 	}
 	
@@ -401,16 +386,17 @@ void keyboard(unsigned char key, int x, int y)
 			enableFog = true;
 		}
 	break;
-
-       case 'z':
-		xScale = yScale = zScale = 1.0f;
-		xRot = yRot = zRot = 0.0f;
-		xMove = yMove = zMove = -0.5f;
-		FOVY = 45.0f; 
-	        cameraAt = vec3(64,1,-64);
-	        cameraEye = vec3(0,2,0); 
-	        old_cameraEye = cameraEye;
-		old_cameraAt = cameraAt;
+		
+	case 'g':
+		//toggle grass animation
+		if (useGrassAnimation)
+		{
+			useGrassAnimation = false;
+		}
+		else
+		{
+			useGrassAnimation = true;
+		}
 	break;
        
 	case '=':
@@ -556,23 +542,6 @@ void keyboard(unsigned char key, int x, int y)
 	
 		lookDirection(90.0f,0.0f);
 	break;*/
-	       
-	case 'c':
-		xScale = yScale = zScale = 1.0f;
-		xRot = yRot = zRot = 0.0f;
-		xMove = yMove = zMove = -0.5f;
-		FOVY = 45.0f; 
-		
-		if (birdsEye)
-		{
-			
-			cameraAt = old_cameraAt;
-			cameraEye = old_cameraEye; 
-				
-			birdsEye = false;
-
-		}
-	break;
 		
 	case 'v':
 		cout << "Camera:\n Position = (" << cameraEye.x << "," << cameraEye.y << "," << cameraEye.z <<")";
@@ -860,6 +829,8 @@ void idle()
 	{
 		vec3 d = step  + 0.1f * glm::normalize(cameraAt - cameraEye);
 		vec3 r = 0.1f * glm::normalize(glm::cross(d, cameraUp));
+		
+		grassAnimation = sin (0.00025 * getTime()) * 10;
 		
 		checkKeys(d, r);
 	}

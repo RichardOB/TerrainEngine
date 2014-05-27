@@ -282,6 +282,8 @@ Texture* grassTex = NULL;
 
 float* grassCoordinates;
 
+float grassAnimation = 0.0f;
+
 /* Toggle Draw Methods */
 
 bool drawTerrain = true;
@@ -292,6 +294,7 @@ bool drawGrass = true;
 bool useReflection = true;
 bool enableFog = false;
 bool anti_alias = false;
+bool useGrassAnimation = true;
 	
 /*METHODS*/
 
