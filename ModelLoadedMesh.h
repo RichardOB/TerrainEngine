@@ -41,6 +41,8 @@ class ModelLoadedMesh: public Mesh
 		* Overloaded so that we can draw indices.
 		*/
 		virtual void draw();
+	
+		virtual float* getCoordinates();	
 
 	private:
 	   

@@ -132,3 +132,8 @@ void Cube::draw()
 	bind();
 	glDrawElements(GL_TRIANGLES, _indexCount, GL_UNSIGNED_INT, NULL);
 }
+
+float* Cube::getCoordinates()
+{
+	return coordinates;
+}

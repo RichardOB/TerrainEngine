@@ -40,26 +40,43 @@ void drawScene()
 {
 	updateFog();
 	
-	glDisable(GL_CULL_FACE);
-	mat4 grassWorld;
-	for (float i = 0; i < 1024; i += 0.5f)
+	if (drawGrass)
 	{
+		glDisable(GL_CULL_FACE);
 		mat4 grassWorld;
-		grassWorld = translate(grassWorld, vec3(i,500.0f,i));
+		/*for (float i = 0; i < 2760; i += 0.5f)
+		{
+			mat4 grassWorld;
+			grassWorld = translate(grassWorld, vec3(i,500.0f,i));
+			grassShader->apply();
+			grassShader->updateWorldMatrix(grassWorld);
+			grassPlane->draw(); 
+		}*/
+		
+		/*for(int i = 0; i < 2760 * 3; i+=3)
+		{
+			cout<<"coords in main: "  << grassCoordinates[i] <<"," << grassCoordinates[i+1] <<","  << grassCoordinates[i+2] << endl;
+		}*/
+		for (int i = 0; i < 2760 * 3; i+=3)
+		{
+			mat4 grassWorld;
+			grassWorld = translate(grassWorld, vec3(grassCoordinates[i],grassCoordinates[i+1],grassCoordinates[i+2]));
+			grassShader->apply();
+			grassShader->updateWorldMatrix(grassWorld);
+			grassPlane->draw(); 
+			//cout << "Grass Pos: (" << grassCoordinates[i] << "," << grassCoordinates[i+1] << "," << grassCoordinates[i+2] << ")" << endl;
+		}
+		/*mat4 grassWorld;
+		grassWorld = translate(grassWorld, vec3(1.0f, 0.0f, 1.0f));
 		grassShader->apply();
 		grassShader->updateWorldMatrix(grassWorld);
 		grassPlane->draw(); 
+		grassWorld = translate(grassWorld, vec3(2.0f, 2.0f, 2.0f));
+		grassShader->updateWorldMatrix(grassWorld);
+		grassPlane->draw(); */
+		glEnable(GL_CULL_FACE);
 	}
-	/*mat4 grassWorld;
-	grassWorld = translate(grassWorld, vec3(1.0f, 0.0f, 1.0f));
-	grassShader->apply();
-	grassShader->updateWorldMatrix(grassWorld);
-	grassPlane->draw(); 
-	grassWorld = translate(grassWorld, vec3(2.0f, 2.0f, 2.0f));
-	grassShader->updateWorldMatrix(grassWorld);
-	grassPlane->draw(); */
-	glEnable(GL_CULL_FACE);
-
+	
 	if(drawTerrain)
 	{	
 		terrainShader->apply();
@@ -106,10 +123,6 @@ void drawScene()
 		glDepthFunc(OldDepthFuncMode);
 		#pragma GCC diagnostic pop
 	}
-	//glDisable(GL_CULL_FACE);
-	
-	//glEnable(GL_CULL_FACE);
-	
 	if (drawWater)
 	{	//glDisable(GL_DEPTH_TEST);
 		glDisable(GL_CULL_FACE);
@@ -124,8 +137,6 @@ void drawScene()
 		}
 		waterPlane->draw();
 		//glEnable(GL_DEPTH_TEST);
-		
-		
 		
 		glEnable(GL_CULL_FACE);
 	}
@@ -307,7 +318,7 @@ void keyboard(unsigned char key, int x, int y)
    {
 	case '1':
 		//toggle skybox
-	cout << "drawSkybox: " << drawSkyBox << endl; 
+		cout << "drawSkybox: " << drawSkyBox << endl; 
 		if (drawSkyBox)
 		{
 			drawSkyBox = false;
@@ -316,10 +327,6 @@ void keyboard(unsigned char key, int x, int y)
 		{
 			drawSkyBox = true;
 		}
-	//drawTerrain = false;
-	//drawSkyBox = false;
-	//drawTiger = false;
-	//useReflection = true;
 	break;
 	
 	case '2':
@@ -361,9 +368,30 @@ void keyboard(unsigned char key, int x, int y)
 		
 	break;
 		
+	case '5':
+		if (drawWater)
+		{
+			drawWater = false;
+		}
+		else
+		{
+			drawWater = true;
+		}
+	break;
+	
+	case '6':
+		if (drawGrass)
+		{
+			drawGrass = false;
+		}
+		else
+		{
+			drawGrass = true;
+		}
+	break;
+		
 	case 'f':
 		//toggle fog
-	cout << "enableFog: " << enableFog << endl; 
 		if (enableFog)
 		{
 			enableFog = false;
@@ -438,33 +466,32 @@ void keyboard(unsigned char key, int x, int y)
 			cout << endl;
 	break;
 	
-	case 'C':
-		tessLevel += 1.0f;
-	break;
-	
-	case 'X':
-		tessLevel -= 1.0f;
+	case ']':
+		if (!anti_alias)
+		{
+			cout << "Applying anti-aliasing" << endl;
+			glEnable(GL_POINT_SMOOTH);
+			glEnable(GL_LINE_SMOOTH);
+			//glEnable(GL_POLYGON_SMOOTH);
+			
+			anti_alias = true;
+		}
+		else if (anti_alias)
+		{
+			cout << "Disabling anti-aliasing" << endl;
+			glDisable(GL_POINT_SMOOTH);
+			glDisable(GL_LINE_SMOOTH);
+			//glDisable(GL_POLYGON_SMOOTH);
+			
+			anti_alias = false;
+		}
 	break;
 		
 	case 'x':
 		
-		if (!birdsEye)
-		{
-			xScale = yScale = zScale = 1.0f;
-			xRot = yRot = zRot = -0.5f;
-			xMove = yMove = zMove = 0.0f;
-			FOVY = 45.0f; 
-			old_cameraEye = vec3(cameraEye.x, cameraEye.y, cameraEye.z);
-			old_cameraAt = vec3(cameraAt.x, cameraAt.y, cameraAt.z);
-			cameraAt = vec3(32,1,-32);
-			cameraEye = vec3(0,60,0);
-
-			birdsEye = true;
-		}
-		
 	break;
 		
-	case '5':
+	/*case '5':
 		//POSITIVE Y
 		cameraAt.x = 10000.0f;
 		//cameraAt.y = 0.0f;
@@ -528,7 +555,7 @@ void keyboard(unsigned char key, int x, int y)
 		cameraAt.z = cameraEye.z;
 	
 		lookDirection(90.0f,0.0f);
-	break;
+	break;*/
 	       
 	case 'c':
 		xScale = yScale = zScale = 1.0f;
@@ -909,6 +936,13 @@ void init ()
 	terrainShader->apply();
 	grid = new Terrain("heightmaps/GoodHeightmap1.png");
 	
+	grassCoordinates = new float[2760 * 3];
+	grassCoordinates = grid->getCoordinates();
+	//cout << "HERE!!!!! " << hhh << endl;
+	
+	
+	
+	
 	mat4 tigerWorld;
 	//tigerWorld = scale(tigerWorld, vec3(0.025f,0.025f,0.025f));
 	tigerWorld = translate(tigerWorld, vec3(60,83,185));
@@ -932,11 +966,11 @@ void init ()
 	
 	mat4 waterWorld;
 	waterWorld = translate(waterWorld, vec3(7.0f, 10.0f, 9.0f));
-	//waterWorld = translate(waterWorld, vec3(7.0f, 65.0f, 9.0f));
+	//waterWorld = translate(waterWorld, vec3(7.0f, 90.0f, 9.0f));
 	waterShader = new Shader("water");
 	waterShader->updateWorldMatrix(waterWorld);
 	waterShader->apply();
-	waterPlane = new Grid(1024, 100.0f);
+	waterPlane = new Grid(2048, 100.0f);
 	
 	mat4 grassWorld;
 	grassWorld = translate(grassWorld, vec3(1.0f, 0.0f, 1.0f));
@@ -975,6 +1009,9 @@ void init ()
 	glActiveTexture(GL_TEXTURE0);
 	nightSkyBox = new CubeMapTexture("textures/skybox", "evening_dunes_positive_x.png", "evening_dunes_negative_x.png", "evening_dunes_positive_y.png", "evening_dunes_negative_y.png", "evening_dunes_positive_z.png", "evening_dunes_negative_z.png");
 	nightSkyBox->load();
+	
+	//vector<vec3> grassPos;
+	//grassPos = grid->getHeights(65.0f);
 	
 	
 
@@ -1020,9 +1057,6 @@ void cleanUp()
 {
 	delete phongShader;
 	phongShader = NULL;
-
-	
-
 
 	int size=(int)(sizeof shaders/sizeof(Shader*));
 		

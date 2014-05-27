@@ -161,3 +161,9 @@ void Board::draw()
 	bind();
 	glDrawElements(GL_TRIANGLES, _indexCount, GL_UNSIGNED_INT, NULL);
 }
+
+float* Board::getCoordinates()
+{
+	float* values;
+	return values;
+}

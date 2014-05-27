@@ -7,10 +7,14 @@ Terrain(string heightMapName):
 	height(0),
 	heightMap(heightMapName.c_str()),
 	_indexCount(0),
-	 vertices()
+	 vertices(),
+	 coords()
 {
 	width = heightMap.get_width();
 	height = heightMap.get_height();
+
+   const unsigned VERTICES_PER_ROW = width;
+   const unsigned VERTICES_PER_COL = height;
 	
 	readPNG();
 	
@@ -18,9 +22,6 @@ Terrain(string heightMapName):
 	{
 		smoothVertices();
 	}
-	
-   const unsigned VERTICES_PER_ROW = width;
-   const unsigned VERTICES_PER_COL = height;
 	
    _vertexCount = (GLsizei)VERTICES_PER_ROW * (GLsizei)VERTICES_PER_COL;
 
@@ -38,14 +39,16 @@ Terrain(string heightMapName):
 
    const unsigned INDEX_ARRAY_SIZE = (unsigned)_indexCount;
    GLuint* indices = new GLuint[INDEX_ARRAY_SIZE];
-
-   const float Z_DELTA = 2.0f;
-   const float X_DELTA = 2.0f;
    
    cout << "width: " << width << endl;
    cout << "height: " << height << endl; 
+   int count = 0;
 
+	
+   coords = new float[2760 * 3];
+   
    unsigned index = 0;
+   unsigned index2 = 0;
    for (unsigned z = 0; z < VERTICES_PER_COL; z++)
    {
       const float Z = (float)z * Z_DELTA;
@@ -59,11 +62,21 @@ Terrain(string heightMapName):
         // vertices[index++] =  ((float)heightMap.get_pixel(x, z).red / width) * 500.0f;
 	 vertices[index++] =  heights[x][z];
          vertices[index++] = Z;
+	
+		if(x < 60 && x > 20 && z > 160 && z < 230)
+		{
+			count ++;
+			cout << "(" << X << "," << heights[x][z] << "," << Z << ")" << endl;
+			coords[index2++] = X/2;
+			coords[index2++] = heights[x/2][z/2];
+			coords[index2++] = Z/2;
+		}
       }
    }
+   cout << "Count: " << count << endl;
+ //  int size = (sizeof(vertices)/sizeof(*float));
+ //  cout << "Size of vertices: " << size << endl;
    
-   cout << "Pixel r [0][0] = " <<  (float)heightMap.get_pixel(0, 0).red << endl;
-
    index = 0;
    for (unsigned z = 0; z < VERTICES_PER_COL - 1; z++)
    {
@@ -128,7 +141,6 @@ void Terrain::smoothVertices()
 	{
 		smooth[i] = new float[height];
 	}
-	
 	
 	float mid_middle;
 	float mid_top;
@@ -264,6 +276,46 @@ float* Terrain:: getRGB(int x, int z)
 	
 	return rgb;
 }
+
+
+float* Terrain::getCoordinates()
+{
+	int size = (sizeof(coords)/sizeof(*coords));
+	cout << "Size in Terrain: " << size << endl;
+	
+	/*for(int i = 0; i < 2760 * 3; i+=3)
+	{
+		cout<<"coords: "  << coords[i] <<"," << coords[i+1] <<","  << coords[i+2] << endl;
+	}*/
+	
+	return coords;
+}
+
+/*void Terrain::getHeights(float height)
+{
+	vector<vec3> out_coordinates;
+	float foundHeight;
+	
+	for (unsigned z = 0; z < VERTICES_PER_COL; z++)
+	{
+	      const float Z = (float)z * Z_DELTA;
+
+	      for (unsigned x = 0; x < VERTICES_PER_ROW; x++)
+	      {
+			const float X = (float)x * X_DELTA;
+
+			foundHeight =  heights[x][z];
+		      
+			if (foundHeight >=height)
+			{
+				vec3 value = vec3(X, foundHeight, Z);
+				out_coordinates.push_back(value);
+			}
+	      }
+	}
+	
+	//rangedHeights = out_coordinates;
+}*/
 #pragma GCC diagnostic pop
 
 

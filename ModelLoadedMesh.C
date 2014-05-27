@@ -338,6 +338,12 @@ void ModelLoadedMesh::draw()
 	glDrawElements(GL_TRIANGLES, _indexCount * 3, GL_UNSIGNED_INT, NULL);
 }
 
+
+float* ModelLoadedMesh::getCoordinates()
+{
+	return coordinates;
+}
+
 string ModelLoadedMesh::charArrayToString(char* characters)
 {
 	string str (characters);

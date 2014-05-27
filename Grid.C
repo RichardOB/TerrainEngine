@@ -87,3 +87,8 @@ draw()
    //glDrawArrays(GL_POINTS, 0, _vertexCount);
 }
 
+float* Grid::getCoordinates()
+{
+	return coordinates;
+}
+

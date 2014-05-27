@@ -24,6 +24,8 @@
 #include "CubeMap.h"
 #include "Board.h"
 
+using std::vector;
+
 using glm::mat4;
 using glm::vec3;
 using glm::rotate;
@@ -278,14 +280,18 @@ Texture* waterTex = NULL;
 
 Texture* grassTex = NULL;
 
+float* grassCoordinates;
+
 /* Toggle Draw Methods */
 
 bool drawTerrain = true;
 bool drawSkyBox = true;
 bool drawTiger = true;
 bool drawWater = true;
+bool drawGrass = true;
 bool useReflection = true;
 bool enableFog = false;
+bool anti_alias = false;
 	
 /*METHODS*/
 

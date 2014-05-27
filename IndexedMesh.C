@@ -13,3 +13,9 @@ draw()
    glDrawElements(GL_TRIANGLES, _indexCount, GL_UNSIGNED_INT, NULL);
 }
 
+
+float* IndexedMesh::getCoordinates()
+{
+	return coordinates;
+}
+

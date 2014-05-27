@@ -26,11 +26,12 @@ using namespace png;
 using glm::cross;
 using glm::normalize;
 using glm::vec3;
-//using png::image;
-//using png::rgb_pixel;
+using glm::vec2;
+
 using std::max;
 using std::min;
 using std::string;
+using std::vector;
 
 /**
   * Encapsulates terrain.
@@ -57,6 +58,8 @@ class Terrain: public Mesh
         */
       virtual void draw();
    
+      virtual float* getCoordinates();
+   
    float* getCoord(unsigned x, unsigned z);
    
    void smoothVertices();
@@ -64,13 +67,18 @@ class Terrain: public Mesh
    void smoothPNG();
    
    void readPNG();
+  
 	
+  // void getHeights(float height);
 	
 float* getRGB(int x, int z);
 
    private:
 	
    const unsigned COMPONENTS;
+   
+   const float Z_DELTA = 2.0f;
+   const float X_DELTA = 2.0f;
 
       unsigned width;
       /** Depth of the heightmap. */
@@ -84,6 +92,10 @@ float* getRGB(int x, int z);
    GLfloat* vertices;
    
    float** heights;
+   
+   float* coords;
+   
+    
 
 };
 

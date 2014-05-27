@@ -70,3 +70,9 @@ void Mesh::toggleWireFrame()
 	
 }
 
+
+float* Mesh::getCoordinates()
+{
+	return coordinates;
+}
+

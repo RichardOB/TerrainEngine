@@ -12,6 +12,7 @@ using std::cerr;
 using std::endl;
 using std::string;
 
+
 class Mesh
 {
    public:
@@ -24,6 +25,8 @@ class Mesh
         * Destructor. Deallocates memory.
         */
       virtual ~Mesh();
+   
+	//virtual float* getCoordinates;
 
       /**
         * Draw the mesh.
@@ -31,6 +34,10 @@ class Mesh
       virtual void draw();
    
       void toggleWireFrame();
+   
+	virtual float * getCoordinates();
+   
+   float* coordinates;
 
    protected:
       /**
