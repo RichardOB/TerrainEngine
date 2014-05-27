@@ -157,9 +157,22 @@ updateWorldMatrix(mat4 matrix)
 void
 Shader::updateUniform(const char* name, float value)
 {
-   GLint location = findUniform(name);
-   glUniform1f(location, value);
+	GLint location = findUniform(name);
+	glUniform1f(location, value);
 }
+
+void Shader::updateUniform(const char* name, vec3 value)
+{
+	GLint location = findUniform(name);
+	glUniform3fv(location, 1, value_ptr(value));
+}
+      
+void Shader::updateUniform(const char* name, mat4 value)
+{
+	GLint location = findUniform(name);
+	glUniformMatrix4fv(location, 1, GL_FALSE, value_ptr(value));
+}
+
 
 GLint Shader::
 findUniform(const char* name)

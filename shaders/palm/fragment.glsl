@@ -4,8 +4,10 @@ layout(binding=2) uniform sampler2D tex;
 
 const int sampleWidth = 1;
 
-const float Ka = 0.8f;
+const float Ka = 0.5f;
 const float Kd = 2f;
+
+uniform float gamma;
 
 in vec4 v_colour;
 in vec3 v_normal;
@@ -37,5 +39,13 @@ void main()
 	//fragment = vec4(intensity * col.xyz, 1.0f);
 	vec4 f_col = vec4(intensity * col.xyz, 1.0f);
 	
-	fragment = mix(f_col, fog_colour, fog_fac);
+	if (gamma == 1.0f)
+	{
+		fragment = sqrt(mix(f_col, fog_colour, fog_fac));
+	}
+	else
+	{
+		fragment = mix(f_col, fog_colour, fog_fac);
+	}
+	
 }

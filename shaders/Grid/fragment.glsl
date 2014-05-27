@@ -6,6 +6,7 @@
 
 //const float Ka = 0.3f;
 //const float Kd = 2f;
+uniform float gamma;
 
 in vec3 v_colour;
 
@@ -32,7 +33,7 @@ void main()
 	//Constrain the fog factor between 0 and 1
 	fog_fac = clamp (fog_fac, 0.0, 1.0);
 	
-	float ambientCoefficient = 0.0f;
+	float ambientCoefficient = 0.1f;
 	float diffuseCoefficient = 0.8f;
 	
 	float ambient = ambientCoefficient;
@@ -41,6 +42,15 @@ void main()
 	float intensity = ambient + diffuse;
 	
 	vec4  f_col = vec4(v_colour * intensity, 1.0f); //with alpha value added. For now it is left to completely opaque.
-	fragment = mix(f_col, fog_colour, fog_fac);
+	
+	if (gamma == 1.0f)
+	{
+		fragment = sqrt(mix(f_col, fog_colour, fog_fac));
+	}
+	else
+	{
+		fragment = mix(f_col, fog_colour, fog_fac);
+	}
+	
 
 }

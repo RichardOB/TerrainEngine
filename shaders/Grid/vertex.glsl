@@ -9,6 +9,7 @@ layout (location=2) in vec3 colour;
 
 //uniform mat4 lightProj;
 //uniform mat4 lightView;
+uniform vec3 lightPos;
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 world;
@@ -26,7 +27,7 @@ void main()
 	
 	
 	//Position of light in world space
-	vec4 light = vec4(1000, 2000, 1000, 1);
+	vec4 light = vec4(lightPos, 1);
 	
 	gl_Position = projection * view * world * vec4(position, 1.0f);
 	
@@ -34,7 +35,7 @@ void main()
 	vec4 worldPos = world * vec4(pos, 1.0f);
 	n = worldPos.xyz;
 	
-	 vec4 surface_pos_eye =  view * world * vec4(position, 1.0f);
+	vec4 surface_pos_eye =  view * world * vec4(position, 1.0f);
 	distance = length(-surface_pos_eye);
 
 	if (fog == 0.0f)

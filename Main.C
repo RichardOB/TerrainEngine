@@ -12,6 +12,7 @@ void display ()
 	//Clears both the screen's colour and the depth of anything it is displaying
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
+	
 	//drawTerrain = false;
 	//drawSkyBox = false;
 	//drawTiger = false;
@@ -39,9 +40,21 @@ void display ()
 void drawScene()
 {
 	updateFog();
+	updateGammaCorrection();
+	lookFromLight();
+	updateLight();
 	
 	if (drawGrass)
 	{
+		if (enableFog)
+		{
+			grassShader->updateUniform("fog", 1.0f);
+		}
+		else
+		{
+			grassShader->updateUniform("fog", 0.0f);
+		}
+		
 		glDisable(GL_CULL_FACE);
 		mat4 grassWorld;
 		for (int i = 0; i < 2760 * 3; i+=3)
@@ -112,14 +125,6 @@ void drawScene()
 	{	//glDisable(GL_DEPTH_TEST);
 		glDisable(GL_CULL_FACE);
 		waterShader->apply();
-		if (enableFog)
-		{
-			//waterShader->updateUniform("fog", 1.0f);
-		}
-		else
-		{
-			//waterShader->updateUniform("fog", 0.0f);
-		}
 		waterPlane->draw();
 		//glEnable(GL_DEPTH_TEST);
 		
@@ -398,6 +403,40 @@ void keyboard(unsigned char key, int x, int y)
 			useGrassAnimation = true;
 		}
 	break;
+		
+	case 'h':
+		if (enableGammaCorrection)
+		{
+			enableGammaCorrection = false;
+		}
+		else
+		{
+			enableGammaCorrection = true;
+		}
+	break;
+		
+	case 'l':
+		if (becomeLight)
+		{
+			becomeLight = false;
+		}
+		else
+		{
+			becomeLight = true;
+		}
+		cout << "Light Angle: " << lightAngle << endl;
+	break;
+		
+	case 'm':
+		lightAngle += 0.01f;
+		updateSun();
+	break;
+	
+	case 'n':
+		lightAngle -= 0.01f;
+		updateSun();
+	break;
+	
        
 	case '=':
 		if (mixRatio < 1.0f)
@@ -763,6 +802,10 @@ void updateFog()
 	{
 		terrainShader->apply();
 		terrainShader->updateUniform("fog", 1.0f);
+		reflectSphere->apply();
+		reflectSphere->updateUniform("fog", 1.0f);
+		waterShader->apply();
+		waterShader->updateUniform("fog", 1.0f);
 		//tigerShader->apply();
 		//tigerShader->updateUniform("fog", 1.0f);
 		//reflectSphere->updateUniform("fog", 1.0f);
@@ -771,11 +814,72 @@ void updateFog()
 	{
 		terrainShader->apply();
 		terrainShader->updateUniform("fog", 0.0f);
+		reflectSphere->apply();
+		reflectSphere->updateUniform("fog", 0.0f);
+		waterShader->apply();
+		waterShader->updateUniform("fog", 0.0f);
 		//tigerShader->apply();
 		//tigerShader->updateUniform("fog", 0.0f);
 		//reflectSphere->updateUniform("fog", 0.0f);
 	}
 	
+}
+
+void updateGammaCorrection()
+{
+	if (enableGammaCorrection)
+	{
+		reflectSphere->apply();
+		reflectSphere->updateUniform("gamma", 1.0f);
+		skyboxShader->apply();
+		skyboxShader->updateUniform("gamma", 1.0f);
+		tigerShader->apply();
+		tigerShader->updateUniform("gamma", 1.0f);
+		terrainShader->apply();
+		terrainShader->updateUniform("gamma", 1.0f);
+		grassShader->apply();
+		grassShader->updateUniform("gamma", 1.0f);
+		waterShader->apply();
+		waterShader->updateUniform("gamma", 1.0f);
+	}
+	else
+	{
+		reflectSphere->apply();
+		reflectSphere->updateUniform("gamma", 0.0f);
+		skyboxShader->apply();
+		skyboxShader->updateUniform("gamma", 0.0f);
+		tigerShader->apply();
+		tigerShader->updateUniform("gamma", 0.0f);
+		terrainShader->apply();
+		terrainShader->updateUniform("gamma", 0.0f);
+		grassShader->apply();
+		grassShader->updateUniform("gamma", 0.0f);
+		waterShader->apply();
+		waterShader->updateUniform("gamma", 0.0f);
+		
+	}
+}
+
+void updateLight()
+{
+	terrainShader->apply();
+	terrainShader->updateUniform("lightPos", lightEye);
+	tigerShader->apply();
+	tigerShader->updateUniform("lightPos", lightEye);
+}
+
+void lookFromLight()
+{
+	if (becomeLight)
+	{
+		old_cameraEye = cameraEye;
+		old_cameraAt = cameraAt;
+		
+		cameraEye = lightEye;
+		cameraAt = lightAt;
+		
+		becomeLight = false;
+	}
 }
 
 void updateProjection(int width, int height)
@@ -842,8 +946,8 @@ void checkKeys(vec3 d, vec3 r)
 	if (active_keys['w'])
 	{
 		//cout << d << endl;
-		cameraEye += 3.0f*d;
-		cameraAt += 3.0f*d;
+		cameraEye += 10.0f*d;
+		cameraAt += 10.0f*d;
 		
 	}
 	else if (active_keys['s'])
@@ -1035,6 +1139,16 @@ void cleanUp()
 		{
 			shaders[i]=NULL;
 		}
+}
+
+void updateSun()
+{
+	//lightAngle = 3.14;
+	lightEye.y = 0.0f + sin(lightAngle) * 1000;
+	lightEye.x = 1024.0f - cos(lightAngle) * 1024;
+	lightEye.z = 1024.0f - cos(lightAngle) * 1024;
+	
+	//lightAt = vec3(lightEye.x - lightEye.y,lightEye.y , lightEye.z - lightEye.y);
 }
 
 int main (int argc, char** argv)

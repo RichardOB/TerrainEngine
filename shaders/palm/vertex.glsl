@@ -12,6 +12,7 @@ uniform mat4 lightView;
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 world;
+uniform vec3 lightPos;
 
 uniform float fog;
 
@@ -46,7 +47,6 @@ void main()
 
 	TexCoord = uv;
 
-	vec3 lightPos = vec3(300.0f, 300.0f, 300.0f);
 	v_lightDir = normalize(lightPos - (world * vec4(position, 1.0f)).xyz);
 }
 

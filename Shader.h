@@ -20,6 +20,7 @@
 
 using glm::mat4;
 using glm::value_ptr;
+using glm::vec3;
 using std::cerr;
 using std::cout;
 using std::endl;
@@ -95,6 +96,10 @@ class Shader
         * @param value The uniform's new value.
         */
       void updateUniform(const char* name, float value);
+      
+      void updateUniform(const char* name, vec3 value);
+      
+      void updateUniform(const char* name, mat4 value);
 
    private:
       /** The OpenGL handle for this shader program. */

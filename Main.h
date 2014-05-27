@@ -233,6 +233,13 @@ GLint projectionLoc;
  */
 GLint tesselationLevelLoc;
 
+/*LIGHT VALUES */
+ 
+vec3 lightEye = vec3(0, 0, 0);
+vec3 lightAt = vec3(1024.0f, 0.0f, 1024.0f);
+vec3 lightUp = vec3(0.0f, 1.0f, 0.0f);
+mat4 lightView = glm::lookAt(lightEye, lightAt, lightUp);
+float lightAngle = 0.0f;
 /*
  * Pointer to the phong Shader program
  */
@@ -293,8 +300,10 @@ bool drawWater = true;
 bool drawGrass = true;
 bool useReflection = true;
 bool enableFog = false;
+bool enableGammaCorrection = false;
 bool anti_alias = false;
 bool useGrassAnimation = true;
+bool becomeLight = false;
 	
 /*METHODS*/
 
@@ -358,6 +367,12 @@ updateAlternateView();
 
 void updateFog();
 
+void updateGammaCorrection();
+
+void updateLight();
+
+void lookFromLight();
+
 /**
  * Updates the current projection matrix used by the shaders (Uniform 'projection').
  *
@@ -409,6 +424,7 @@ void toggleWireFrame();
  */
 GLint findAttribute(const char*);
 
+void updateSun();
 
 /**
  * Clean up any resources we may have used
